@@ -26,6 +26,12 @@ void BaseWindow::registerWidget(const std::string &name, Widget &widget){
     registry_widget[name] = &widget;
 }
 
+Widget* BaseWindow::findWidget(const std::string& name) const {
+    auto it = registry_widget.find(name);
+    return (it != registry_widget.end()) ? it->second : nullptr;
+}
+
+
 void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;
@@ -114,6 +120,12 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
         case MSG_KEYDOWN:
             self->msg_keydown(wParam, lParam);
             break;
+		case MSG_KEYLONGPRESS:
+			self->msg_key_long_press(wParam, lParam);
+			break;
+		case MSG_KEYUP_LONG:
+			self->msg_keyup_long(wParam, lParam);
+			break;
         case MSG_TIMER:
             self->msg_timer(wParam, lParam);
             break;
@@ -191,6 +203,16 @@ void BaseWindow::msg_keyup(WPARAM wParam, LPARAM lParam)  {
 void BaseWindow::msg_keydown(WPARAM wParam, LPARAM lParam)  {
     for(auto& pair : registry_widget){
         pair.second->msg_keydown(wParam, lParam);
+    }
+}
+void BaseWindow::msg_key_long_press(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair.second->msg_key_long_press(wParam, lParam);
+    }
+}
+void BaseWindow::msg_keyup_long(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair.second->msg_keyup_long(wParam, lParam);
     }
 }
 void BaseWindow::msg_timer(WPARAM wParam, LPARAM lParam)  {

@@ -134,6 +134,8 @@ public:
     virtual void msg_mousemove(int x, int y){};
     virtual void msg_keyup(WPARAM wParam, LPARAM lParam){};
     virtual void msg_keydown(WPARAM wParam, LPARAM lParam){};
+	virtual void msg_key_long_press(WPARAM wParam, LPARAM lParam) {};
+	virtual void msg_keyup_long(WPARAM wParam, LPARAM lParam) {};
     virtual void msg_timer(WPARAM wParam, LPARAM lParam){};
     virtual void msg_paint(HDC hdc){};
     virtual void msg_close(WPARAM wParam, LPARAM lParam){};

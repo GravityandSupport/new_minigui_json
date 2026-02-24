@@ -62,6 +62,16 @@ void Widget::msg_keydown(WPARAM wParam, LPARAM lParam)  {
         pair->msg_keydown(wParam, lParam);
     }
 }
+void Widget::msg_key_long_press(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair->msg_key_long_press(wParam, lParam);
+    }
+}
+void Widget::msg_keyup_long(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair->msg_keyup_long(wParam, lParam);
+    }
+}
 void Widget::msg_timer(WPARAM wParam, LPARAM lParam)  {
     for(auto& pair : registry_widget){
         pair->msg_timer(wParam, lParam);

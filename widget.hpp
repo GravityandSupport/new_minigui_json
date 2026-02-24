@@ -25,6 +25,8 @@ public:
     virtual void msg_mousemove(int x, int y) override;
     virtual void msg_keyup(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_keydown(WPARAM wParam, LPARAM lParam) override;
+	virtual void msg_key_long_press(WPARAM wParam, LPARAM lParam) override;
+	virtual void msg_keyup_long(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_timer(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_paint(HDC hdc) override;
     virtual void msg_close(WPARAM wParam, LPARAM lParam) override;

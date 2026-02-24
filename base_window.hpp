@@ -31,6 +31,7 @@ public:
     std::unordered_map<std::string, Widget*> registry_widget; // 子控件
 
     virtual void registerWidget(const std::string &name, Widget &widget);
+	Widget* findWidget(const std::string& name) const; // 通过名字查找已注册的控件，找不到返回nullptr
 
 	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call);
 	
@@ -41,6 +42,8 @@ public:
     virtual void msg_mousemove(int x, int y) override;
     virtual void msg_keyup(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_keydown(WPARAM wParam, LPARAM lParam) override;
+	virtual void msg_key_long_press(WPARAM wParam, LPARAM lParam) override;
+	virtual void msg_keyup_long(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_timer(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_paint(HDC hdc) override;
     virtual void msg_close(WPARAM wParam, LPARAM lParam) override;

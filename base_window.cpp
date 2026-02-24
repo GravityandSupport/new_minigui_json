@@ -278,6 +278,20 @@ void BaseWindow::Close(){
 	PostMessage(hWnd, MSG_CLOSE, 0, 0); 
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void BaseWindow::uninstallResources(){
+	bvm_UnloadAllBitmaps(); // 不建议在这里卸载位图，如果这里不卸载位图，在init消息里面就可以避免每次打开窗口都重新加载一次位图
+}
 
 
+bool BaseWindow::bvm_LoadBitmap(BITMAP& bmp, const char* path){
+	return bitmap_manager.load(bmp, path);
+}
+
+void BaseWindow::bvm_UnloadAllBitmaps(){
+	bitmap_manager.unLoadAll();
+}
 

@@ -3,6 +3,8 @@
 #include "base_attr.hpp"
 #include "widget.hpp"
 
+#include "bitmap_manager.hpp"
+
 #define __UI_WINDOW_COMMON_UPDATE__ 10
 
 class BaseWindow : public BaseAttr {
@@ -15,7 +17,10 @@ public:
 
     virtual void configDLG();
     virtual void loadResources(){} // 加载资源，比如照片啥的，添加部件也要放在这部分
-    virtual void uninstallResources(){} // 卸载资源 
+    virtual void uninstallResources(); // 卸载资源 
+    BitmapManager bitmap_manager;
+	bool bvm_LoadBitmap(BITMAP& bmp, const char* path); // 加载位图数据，并加入管理队列，
+	void bvm_UnloadAllBitmaps(); // 统一卸载全部管理的位图资源
 
     static int winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
     

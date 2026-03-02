@@ -132,6 +132,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
         case MSG_PAINT:
             hdc=BeginPaint(hWnd);
             SetBkMode(hdc, BM_TRANSPARENT);
+			self->cache_hdc = hdc;
             self->msg_paint(hdc);
             SetBkMode(hdc, BM_OPAQUE);
             EndPaint(hWnd, hdc);
@@ -287,11 +288,40 @@ void BaseWindow::uninstallResources(){
 }
 
 
-bool BaseWindow::bvm_LoadBitmap(BITMAP& bmp, const char* path){
-	return bitmap_manager.load(bmp, path);
+int BaseWindow::bvm_LoadBitmap(const char* path){
+	return bitmap_manager.load(path);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc){
+	bitmap_manager.paint(hdc, index, rc);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y){
+	bitmap_manager.paint(hdc, index, x, y);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h){
+	bitmap_manager.paint(hdc, index, x, y, w, h);
 }
 
 void BaseWindow::bvm_UnloadAllBitmaps(){
 	bitmap_manager.unLoadAll();
+}
+
+
+
+void BaseWindow::drawText(const char* pText, int nCount, 
+                			int x, int y, int w, int h, UINT nFormat){
+	RECT text_rc;
+	SetRect(&text_rc, x, y, x+w, y+h);
+	DrawText(cache_hdc, pText, nCount, &text_rc, nFormat);
+}
+
+void BaseWindow::drawText(int pText, int nCount, 
+							int x, int y, int w, int h, UINT nFormat){
+	RECT text_rc;
+	SetRect(&text_rc, x, y, x+w, y+h);
+	std::string text = std::to_string(pText);
+	DrawText(cache_hdc, text.c_str(), nCount, &text_rc, nFormat);
 }
 

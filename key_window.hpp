@@ -1,6 +1,34 @@
 #pragma once
 
-#include "../common/common.hpp"
+#include "common.hpp"
+
+
+class KeyWindowWidget : public Widget{
+private:
+	bool m_isFocusGained = false; // 是否获取窗口的输入焦点
+public:
+    KeyWindowWidget(const std::string& str):Widget(str){
+
+    }
+    virtual ~KeyWindowWidget() = default;
+
+	virtual bool isFocusGained() { return m_isFocusGained; } // 是否获取窗口的输入焦点
+	
+    virtual void onFocusLost(){ // 丢失焦点
+		LOG_DEBUG("焦点", name, "丢失焦点");
+
+		m_isFocusGained = false;
+		updateDirtyArea(); // 更新控件
+	}
+    virtual void onFocusGained() { // 获取焦点
+		LOG_DEBUG("焦点", name, "获取焦点");
+
+		m_isFocusGained = true;
+		updateDirtyArea(); // 更新控件
+	}
+    
+};    
+
 
 class KeyWindow : public BaseWindow{
 public:	
@@ -12,15 +40,15 @@ public:
     virtual ~KeyWindow() = default;
 	
 	// 二维是横向，一维是纵向
-	std::vector<std::vector<Widget*>> key_layout; // 按键布局
+	std::vector<std::vector<KeyWindowWidget*>> key_layout; // 按键布局
 //	using BaseWindow::registerWidget;
-	virtual void registerWidget(const std::string &name, Widget &widget) override; // 默认是添加一行
-	virtual void registerWidget(const std::string &name, size_t row, Widget &widget); // 往一行后面追加控件，该行不存在会自动生成一行
-	virtual void registerWidget(const std::string &name, size_t row, size_t col, Widget &widget); // 往固定位置添加控件，如果该位置原本没有控件会抛异常，注意捕获
+	virtual void registerWidget(const std::string &name, KeyWindowWidget &widget) ; // 默认是添加一行
+	virtual void registerWidget(const std::string &name, size_t row, KeyWindowWidget &widget); // 往一行后面追加控件，该行不存在会自动生成一行
+	virtual void registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget); // 往固定位置添加控件，如果该位置原本没有控件会抛异常，注意捕获
 
 	// 获取指定行的引用（用于直接操作）
-	std::vector<Widget*>& getRow(size_t row); // 不存在会抛错误，注意捕获
-	Widget* getRow(size_t row, size_t col) const;// 获取指定控件指针，不存在返回空，要判空
+	std::vector<KeyWindowWidget*>& getRow(size_t row); // 不存在会抛错误，注意捕获
+	KeyWindowWidget* getRow(size_t row, size_t col) const;// 获取指定控件指针，不存在返回空，要判空
 
 	bool setFocus(size_t row, size_t col); // 设置当前焦点到指定位置
 	bool setFocus(const std::string& name); // 设置当前焦点到指定控件（通过名称）
@@ -28,7 +56,7 @@ public:
 	std::pair<int, int> getFocus() const { return current_focus; } // 获取当前焦点位置
 
 	bool hasFocus() const { return current_focus.first >= 0 && current_focus.second >= 0; } // 判断是否有焦点
-	Widget* getCurrentWidget() const; // 获取当前焦点控件（返回 nullptr 表示无焦点）
+	KeyWindowWidget* getCurrentWidget() const; // 获取当前焦点控件（返回 nullptr 表示无焦点）
 	void clearFocus(); // 清除焦点
 	bool focusFirst(); // 移动到第一行第一个控件
 	bool focusLast();     // 移动到最后一个控件
@@ -39,8 +67,9 @@ public:
     bool focusDown();// 向下移动焦点
     bool focusLeft();// 向左移动焦点
     bool focusRight();// 向右移动焦点
-    virtual bool focusMoveControl(WPARAM wParam, LPARAM lParam); // 此函数负责焦点的上下左右移动控制，子类可以重写此函数改变上下左右移动的按键消息
-
+	// 此函数负责焦点的上下左右移动控制，子类可以重写此函数改变上下左右移动的按键消息
+	// 如果该函数处理了消息会返回true，否则返回 false
+    virtual bool focusMoveControl(WPARAM wParam, LPARAM lParam); 
 	size_t getRowCount() const { return key_layout.size(); } // 获取行数
 	size_t getColumnCount(size_t row) const; // 获取某行的列数
 	
@@ -72,4 +101,7 @@ public:
 };
 
 #include "key_window.inl"
+
+
+
 

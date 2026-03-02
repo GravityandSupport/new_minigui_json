@@ -9,16 +9,10 @@ public:
 	std::vector<BITMAP*> m_loadedBitmaps; // 存储已加载位图指针的容器
 
 	// 加载位图资源 
-	int load(BITMAP& bmp, const char* path){
-		BITMAP* pBmp = &bmp;
-		if (IsManaged(pBmp)) {
-			// 找到已存在的索引
-	        int index = findIndex(pBmp);
-            LOG_DEBUGC("位图加载", "位图 %p 已经加载过了", pBmp);
-            return index;
-        }
+	int load(const char* path){
+		BITMAP* pBmp = new BITMAP();
 
-		if (LoadBitmap(HDC_SCREEN, &bmp, path) != 0) {
+		if (LoadBitmap(HDC_SCREEN, pBmp, path) != 0) {
             LOG_DEBUGC("位图加载", "%s fail", path);
             return -1;
         }
@@ -35,6 +29,7 @@ public:
         for (auto* bmp : m_loadedBitmaps) {
             if (bmp) {
                 UnloadBitmap(bmp);
+				delete bmp;
             }
         }
         m_loadedBitmaps.clear();
@@ -43,23 +38,29 @@ public:
 
 	// 通过索引获取位图数据
 	PBITMAP get(size_t index){
-		if (index >= m_loadedBitmaps.size() || index < 0) {
+		if (index >= m_loadedBitmaps.size()) { // size_t 是无符号类型，只需检查上界 
             return nullptr;
         }
         return m_loadedBitmaps[index];
 	}
 
 	// 通过索引来绘画位图照片
-	void paint(HDC hdc, RECT rc, size_t index){
+	void paint(HDC hdc, size_t index, const RECT &rc){
 		PBITMAP pbitmap = get(index);
 		if(pbitmap==nullptr) {LOG_DEBUG("位图", "位图不存在，无法绘制"); return ;}
 		FillBoxWithBitmap(hdc, rc.left, rc.top, RECTW(rc), RECTH(rc), pbitmap);
 	}
 
-	void paint(HDC hdc, int x, int y, size_t index){
+	void paint(HDC hdc, size_t index, int x, int y){
 		PBITMAP pbitmap = get(index);
 		if(pbitmap==nullptr) {LOG_DEBUG("位图", "位图不存在，无法绘制"); return ;}
 		FillBoxWithBitmap(hdc, x, y, pbitmap->bmWidth, pbitmap->bmHeight, pbitmap);
+	}
+
+	void paint(HDC hdc, size_t index, int x, int y, int w, int h){
+		PBITMAP pbitmap = get(index);
+		if(pbitmap==nullptr) {LOG_DEBUG("位图", "位图不存在，无法绘制"); return ;}
+		FillBoxWithBitmap(hdc, x, y, w, h, pbitmap);
 	}
 
 	// 查找位图指针在 vector 中的索引，未找到返回 -1

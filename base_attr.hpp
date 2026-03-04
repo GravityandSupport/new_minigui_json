@@ -67,7 +67,7 @@ public:
     bool status; // 控件状态，是否显示
 
     // 窗口句柄
-    HWND hWnd;
+    HWND hWnd = HWND_NULL;
 
     nlohmann::json json;
 
@@ -127,6 +127,10 @@ public:
 		unifiedUpdate(base_attr.hWnd, widgets, call);
 	}
 
+	virtual void postMessage(int iMsg, WPARAM wParam, LPARAM lParam){
+		PostMessage(hWnd, iMsg, wParam, lParam);
+	}
+	
     virtual void msg_init(WPARAM wParam, LPARAM lParam){};
     virtual void msg_command(WPARAM wParam, LPARAM lParam){};
     virtual void msg_lbutton_down(int x, int y){};

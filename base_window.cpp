@@ -54,6 +54,10 @@ void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, 
 	}
 }
 
+void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets){
+	unifiedUpdate(widgets, [](){});
+}
+
 void BaseWindow::configDLG(){
     dlg.dwStyle = WS_VISIBLE;
     dlg.dwExStyle = WS_EX_AUTOSECONDARYDC;

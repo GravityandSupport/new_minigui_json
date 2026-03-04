@@ -48,7 +48,9 @@ public:
     virtual void registerWidget(const std::string &name, Widget &widget);
 	Widget* findWidget(const std::string& name) const; // 通过名字查找已注册的控件，找不到返回nullptr
 
+	using BaseAttr::unifiedUpdate;
 	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call);
+	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets);
 	
     virtual void msg_init(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_command(WPARAM wParam, LPARAM lParam) override;

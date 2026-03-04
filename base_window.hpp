@@ -19,7 +19,10 @@ public:
     virtual void loadResources(){} // 加载资源，比如照片啥的，添加部件也要放在这部分
     virtual void uninstallResources(); // 卸载资源 
     BitmapManager bitmap_manager;
-	bool bvm_LoadBitmap(BITMAP& bmp, const char* path); // 加载位图数据，并加入管理队列，
+	int bvm_LoadBitmap(const char* path); // 加载位图数据，并加入管理队列，
+	void bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc); // 绘制位图
+	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y);
+	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h);
 	void bvm_UnloadAllBitmaps(); // 统一卸载全部管理的位图资源
 
     static int winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);

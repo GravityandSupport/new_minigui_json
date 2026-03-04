@@ -287,8 +287,20 @@ void BaseWindow::uninstallResources(){
 }
 
 
-bool BaseWindow::bvm_LoadBitmap(BITMAP& bmp, const char* path){
-	return bitmap_manager.load(bmp, path);
+int BaseWindow::bvm_LoadBitmap(const char* path){
+	return bitmap_manager.load(path);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc){
+	bitmap_manager.paint(hdc, index, rc);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y){
+	bitmap_manager.paint(hdc, index, x, y);
+}
+
+void BaseWindow::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h){
+	bitmap_manager.paint(hdc, index, x, y, w, h);
 }
 
 void BaseWindow::bvm_UnloadAllBitmaps(){

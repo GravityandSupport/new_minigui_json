@@ -1,12 +1,12 @@
 #include "key_window.hpp"
 
-void KeyWindow::registerWidget(const std::string &name, Widget &widget){
+void KeyWindow::registerWidget(const std::string &name, KeyWindowWidget &widget){
 	BaseWindow::registerWidget(name, widget);
 	key_layout.emplace_back();          // 添加空行
     key_layout.back().push_back(&widget); // 该行只包含此控件
 }
 
-void KeyWindow::registerWidget(const std::string &name, size_t row, Widget &widget){
+void KeyWindow::registerWidget(const std::string &name, size_t row, KeyWindowWidget &widget){
 	BaseWindow::registerWidget(name, widget);
 	// 策略：自动填充缺失的中间行（空行）
     if (row >= key_layout.size()) {
@@ -15,7 +15,7 @@ void KeyWindow::registerWidget(const std::string &name, size_t row, Widget &widg
     key_layout[row].push_back(&widget);
 }
 
-void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, Widget &widget){
+void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget){
 	BaseWindow::registerWidget(name, widget);
 	if (row >= key_layout.size()) {
         LOG_ERROR("越界", "row超过key_layout.size()，无法创建");
@@ -29,14 +29,14 @@ void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, 
 	key_layout[row].insert(key_layout[row].begin() + col, &widget);
 }
 
-std::vector<Widget*>& KeyWindow::getRow(size_t row) {
+std::vector<KeyWindowWidget*>& KeyWindow::getRow(size_t row) {
     if (row >= key_layout.size()) {
         throw std::out_of_range("Row index out of range");
     }
     return key_layout[row];
 }
 
-Widget* KeyWindow::getRow(size_t row, size_t col) const {
+KeyWindowWidget* KeyWindow::getRow(size_t row, size_t col) const {
     if (row >= key_layout.size() || col >= key_layout[row].size()) {
 		LOG_ERROR("越界", row, key_layout.size(), col);
         return nullptr; // 安全返回，避免异常
@@ -55,16 +55,16 @@ bool KeyWindow::setFocus(size_t row, size_t col) {
     }
     
     // 失去焦点回调（如果有）
-//    if (hasFocus()) {
-//        Widget* old = getCurrentWidget();
-//        if (old) old->onFocusLost();
-//    }
+    if (hasFocus()) {
+        KeyWindowWidget* old = getCurrentWidget();
+        if (old) old->onFocusLost();
+    }
     
     current_focus = {static_cast<int>(row), static_cast<int>(col)};
     
     // 获得焦点回调
-//    Widget* current = getCurrentWidget();
-//    if (current) current->onFocusGained();
+    KeyWindowWidget* current = getCurrentWidget();
+    if (current) current->onFocusGained();
     
     return true;
 }
@@ -187,7 +187,7 @@ bool KeyWindow::focusRightMost() {
     return false;
 }
 
-Widget* KeyWindow::getCurrentWidget() const {
+KeyWindowWidget* KeyWindow::getCurrentWidget() const {
     if (!hasFocus()) return nullptr;
     return key_layout[current_focus.first][current_focus.second];
 }
@@ -232,17 +232,20 @@ size_t KeyWindow::getColumnCount(size_t row) const {
 bool KeyWindow::focusMoveControl(WPARAM wParam, LPARAM lParam)  {
     switch(wParam){
 		case SCANCODE_CURSORBLOCKUP:
-			return focusUp();
-			break;
+			focusUp();
+			return true;
 		case SCANCODE_CURSORBLOCKDOWN:
 			return focusDown();
-			break;
+			return true;
 		case SCANCODE_CURSORBLOCKLEFT:
 			return focusLeft();
-			break;
+			return true;
 		case SCANCODE_CURSORBLOCKRIGHT:
 			return focusRight();
-			break;
+			return true;
+		case SCANCODE_ESCAPE: // 默认关闭窗口消息
+			Close();
+			return true;
 		default:break;
     }
 	

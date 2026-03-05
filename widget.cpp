@@ -1,11 +1,9 @@
 #include "widget.hpp"
 #include "base_window.hpp"
 
-static Widget null_widget;
-static BaseWindow null_window;
 
 Widget::Widget(const std::string& str)
-    : BaseAttr(str), parentWindow(&null_window), parentWidget(&null_widget){
+    : BaseAttr(str){
 
 }
 

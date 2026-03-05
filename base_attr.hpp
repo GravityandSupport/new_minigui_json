@@ -57,6 +57,16 @@ extern "C" {
 class BaseAttr {
 protected:
 public:
+	struct Point{
+		int x, y;
+		Point() = default;
+		Point(int _x, int _y) : x(_x), y(_y){}
+
+		void print() const {
+			std::cout << "(" << x << ", " << y << ")" << std::endl;
+		}
+	};
+	
 	bool is_can_update = true; // 是否可以更新脏区域，仅用于 updateDirtyArea() 函数
 	
     // 窗口/控件 名字
@@ -146,7 +156,7 @@ public:
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam){};
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam){};
 
-
+	BaseAttr() = default;
     BaseAttr(const std::string& str){
         json = nlohmann::json::parse(str);
         parseJson();

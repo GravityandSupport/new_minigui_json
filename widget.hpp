@@ -39,8 +39,9 @@ public:
 
     virtual void registerWidget(Widget &widget);
 
-    void getParentOffset();
+	Point getAbsoluteOffset(); // 会把当前widget::rc的坐标当做对父窗口的偏移坐标，返回控件的坐标基于父窗口的偏移坐标
 
+	Widget() = default;
     Widget(const std::string& str);
     virtual ~Widget() = default;
 };

@@ -1,7 +1,11 @@
 #include "widget.hpp"
+#include "base_window.hpp"
+
+static Widget null_widget;
+static BaseWindow null_window;
 
 Widget::Widget(const std::string& str)
-    : BaseAttr(str){
+    : BaseAttr(str), parentWindow(&null_window), parentWidget(&null_widget){
 
 }
 
@@ -10,18 +14,22 @@ void Widget::registerWidget(Widget &widget){
     registry_widget.emplace_back(&widget);
 }
 
-void Widget::getParentOffset(){
-    // RECT sub_rc;
-    // sub_rc.left = x + rc.left;
-    // sub_rc.top = y + rc.top;
-    // return sub_rc;
-    if(parentWidget==nullptr) {return ;}
-    int w = RECTW(parentWidget->rc);
-    int h = RECTH(parentWidget->rc);
-    rc.left += parentWidget->rc.left;
-    rc.top += parentWidget->rc.top;
-    rc.right += rc.left + w;
-    rc.bottom += rc.top + h;
+Widget::Point Widget::getAbsoluteOffset()
+{
+    int x = 0;
+    int y = 0;
+
+    const Widget* current = this;
+
+    // 一直向父控件递归累加
+    while(current != &null_widget)
+    {
+        x += current->rc.left;
+        y += current->rc.top;
+        current = current->parentWidget;
+    }
+
+    return Point(x, y);
 }
 
 

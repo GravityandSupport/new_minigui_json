@@ -67,6 +67,7 @@ public:
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam) override;
 
+	BaseWindow() = default;
     BaseWindow(const std::string& str);
     virtual ~BaseWindow();
 };

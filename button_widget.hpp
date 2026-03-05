@@ -12,6 +12,7 @@ public:
 	int button_lift_bitmap =-1;
 
 	void setButtonBitmap(int press_bitmap=-1, int lift_bitmap=-1);
+	bool isButtonPress() { return m_isButtonPress;}
 	
     virtual void msg_lbutton_down(int x, int y) override;
     virtual void msg_lbutton_up(int x, int y) override;

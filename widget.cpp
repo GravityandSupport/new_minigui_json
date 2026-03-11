@@ -20,7 +20,7 @@ Widget::Point Widget::getAbsoluteOffset()
     const Widget* current = this;
 
     // 一直向父控件递归累加
-    while(current != &null_widget)
+    while(current != nullptr)
     {
         x += current->rc.left;
         y += current->rc.top;

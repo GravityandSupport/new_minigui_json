@@ -95,7 +95,16 @@ bool KeyWindow::focusUp() {
             return setFocus(r, col);
         }
     }
-    
+
+	// 没找到 → 去上一行（如果有）的最后一个控件
+    if (row > 0) {
+        int prev_row = row - 1;
+        int last_col = static_cast<int>(key_layout[prev_row].size()) - 1;
+        if (last_col >= 0) {
+            return setFocus(prev_row, last_col);
+        }
+    }
+	
     // 如果下面没有，跳到最后一个
     return focusLast();
 }
@@ -112,7 +121,16 @@ bool KeyWindow::focusDown() {
             return setFocus(r, col);
         }
     }
-    
+
+	// 没找到 → 去下一行（如果有）的最后面那个控件
+	if (row + 1 < static_cast<int>(key_layout.size())) {
+        int next_row = row + 1;
+        size_t last = key_layout[next_row].size();
+        if (last > 0) {
+            return setFocus(next_row, last - 1);
+        }
+    }
+	
     // 如果下面没有，跳到第一个
     return focusFirst();
 }

@@ -13,11 +13,16 @@ public:
     // virtual bool start(HWND hParent);
 
     // virtual void configDLG();
-    // virtual void loadResources(){} // 加载资源，比如照片啥的
+    // virtual void loadResources(){} // 加载资源，比如照片啥�?
     // virtual void uninstallResources(){} // 卸载资源 
 
     // static int winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
 
+	void drawText(const char* pText, int nCount, 
+                			int x, int y, int w, int h, UINT nFormat);
+	void drawText(int pText, int nCount, 
+                			int x, int y, int w, int h, UINT nFormat);
+	
     virtual void msg_init(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_command(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_lbutton_down(int x, int y) override;

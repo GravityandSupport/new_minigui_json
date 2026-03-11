@@ -103,3 +103,34 @@ void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
         pair->msg_destroy(wParam, lParam);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+void Widget::drawText(const char* pText, int nCount, 
+                			int x, int y, int w, int h, UINT nFormat){
+	if(parentWindow){
+		parentWindow->drawText(pText, nCount, x, y, w, h, nFormat);
+	}
+}
+
+void Widget::drawText(int pText, int nCount, 
+							int x, int y, int w, int h, UINT nFormat){
+	if(parentWindow){
+		parentWindow->drawText(pText, nCount, x, y, w, h, nFormat);
+	}
+}
+
+
+
+
+
+

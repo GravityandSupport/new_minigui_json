@@ -34,9 +34,12 @@ public:
 	
     static int winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
     
-    static std::unordered_map<std::string, BaseWindow*> 
-                                        registry_window, /*已注册的窗口*/
-                                        registry_open_window; /*已打开的窗口*/
+    static std::unordered_map<std::string, BaseWindow*> registry_open_window; /*已打开的窗口*/
+                                        
+    static std::map<std::string, BaseWindow*>& getRegistryWindow(){ /*已注册的窗口*/
+		static std::map<std::string, BaseWindow*> registry;
+        return registry;
+    }
 
 	static void Create(const std::string &window_name, BaseWindow &hParent);			// 打开窗口
 	static void Create(const std::string &window_name, HWND hParent);			// 打开窗口

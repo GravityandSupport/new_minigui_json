@@ -4,6 +4,7 @@ BaseWindow::BaseWindow(const std::string& str)
     : BaseAttr(str){
     
     if (!name.empty()) {  // 注意是 !name.empty()
+    	auto& registry_window = getRegistryWindow();
         registry_window[name] = this;
         std::cout << "✓ 已注册: " << name << " (地址: " << this << ")\n";
     } else {
@@ -13,6 +14,7 @@ BaseWindow::BaseWindow(const std::string& str)
 
 BaseWindow::~BaseWindow(){
     if (!name.empty()) {
+		auto& registry_window = getRegistryWindow();
         auto it = registry_window.find(name);
         if (it != registry_window.end() && it->second == this) {
             registry_window.erase(it);
@@ -247,9 +249,7 @@ void BaseWindow::msg_destroy(WPARAM wParam, LPARAM lParam)  {
 }
 
 
-std::unordered_map<std::string, BaseWindow*> 
-            BaseWindow::registry_window,
-            BaseWindow::registry_open_window;
+  std::unordered_map<std::string, BaseWindow*> BaseWindow::registry_open_window;
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -265,6 +265,7 @@ void BaseWindow::Create(const std::string &window_name, HWND hParent){
 		return ;
 	}
 
+	auto& registry_window = getRegistryWindow();
 	auto it = registry_window.find(window_name);
 	if(it == registry_window.end()) {LOG_INFO("该窗口没有注册过，找不到对应句柄"); return ;}
 	it->second->start(hParent);

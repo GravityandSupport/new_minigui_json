@@ -11,7 +11,7 @@ class BaseWindow : public BaseAttr {
 protected:
 	HDC cache_hdc;
 public:
-	RECT dirty_rc; // 脏区域，在 msg_common 消息中刷新这个区域
+	std::vector<RECT> dirty_rc_list; // 脏区域，在 msg_common 消息中刷新这个区域
 	
     DLGTEMPLATE dlg;
 

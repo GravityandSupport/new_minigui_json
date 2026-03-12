@@ -49,7 +49,7 @@ void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, 
 		}
 	}
 	call();
-	dirty_rc = prev_rc;
+	dirty_rc_list.push_back(prev_rc);
 	PostMessage(hWnd, MSG_COMMAND, __UI_WINDOW_COMMON_UPDATE__, 0); // 通过 msg_common 来执行刷新功能
 	for (BaseAttr *w : widgets){
 		w->is_can_update = true; // 允许刷新
@@ -178,6 +178,11 @@ void BaseWindow::msg_command(WPARAM wParam, LPARAM lParam)  {
 	switch (wParam){
 		case __UI_WINDOW_COMMON_UPDATE__:{
 //			LOG_DEBUG("刷新区域", dirty_rc.left, dirty_rc.top, dirty_rc.right, dirty_rc.bottom);
+			static RECT dirty_rc = {0}; // 这个最好是全局变量，因为待会消息结束了这个变量就被释放了
+			for (RECT& rect : dirty_rc_list){
+				dirty_rc = computBoundBox(rect, dirty_rc);
+			}
+			dirty_rc_list.clear();
 			InvalidateRect(hWnd, &dirty_rc, true);
 			break;
 		}

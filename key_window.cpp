@@ -82,97 +82,151 @@ bool KeyWindow::setFocus(Widget* widget) {
     return setFocus(pos.first, pos.second);
 }
 
+// ────────────────────────────────────────────────
+
+// 辅助函数：尝试设置焦点，如果目标 widget 不可焦点则返回 false
+bool KeyWindow::trySetFocus(int row, int col) {
+    if (row < 0 || row >= static_cast<int>(key_layout.size())) {
+        return false;
+    }
+    if (col < 0 || col >= static_cast<int>(key_layout[row].size())) {
+        return false;
+    }
+    
+    KeyWindowWidget* widget = key_layout[row][col];
+    if (widget && widget->canFocus()) {
+        return setFocus(row, col);
+    }
+    return false;
+}
+
+// ────────────────────────────────────────────────
+
+////////////////////////////////////////////////////////////
+// 移动相关开始
+
 
 bool KeyWindow::focusUp() {
-    if (!hasFocus()) return focusFirst();  // 无焦点时跳到第一个
-    
+    if (!hasFocus()) return focusFirst();
+
     int row = current_focus.first;
     int col = current_focus.second;
-    
-    // 向上找同一列的控件
+
+    // 优先：向上找同一列 第一个可焦点的
     for (int r = row - 1; r >= 0; --r) {
-        if (col < static_cast<int>(key_layout[r].size())) {
-            return setFocus(r, col);
+        if (trySetFocus(r, col)) {
+            return true;
         }
     }
 
-	// 没找到 → 去上一行（如果有）的最后一个控件
+    // 没找到同列 → 尝试上一行的最右边
     if (row > 0) {
         int prev_row = row - 1;
         int last_col = static_cast<int>(key_layout[prev_row].size()) - 1;
         if (last_col >= 0) {
-            return setFocus(prev_row, last_col);
+            if (trySetFocus(prev_row, last_col)) {
+                return true;
+            }
         }
     }
-	
-    // 如果下面没有，跳到最后一个
+
+    // 实在找不到 → 跳到最后一个可焦点的
     return focusLast();
 }
 
+
 bool KeyWindow::focusDown() {
-    if (!hasFocus()) return focusFirst();  // 无焦点时跳到第一个
-    
+    if (!hasFocus()) return focusFirst();
+
     int row = current_focus.first;
     int col = current_focus.second;
-    
-    // 向下找同一列的控件
+
+    // 优先：向下找同一列 第一个可焦点的
     for (size_t r = row + 1; r < key_layout.size(); ++r) {
-        if (col < static_cast<int>(key_layout[r].size())) {
-            return setFocus(r, col);
+        if (trySetFocus(static_cast<int>(r), col)) {
+            return true;
         }
     }
 
-	// 没找到 → 去下一行（如果有）的最后面那个控件
-	if (row + 1 < static_cast<int>(key_layout.size())) {
+    // 没找到同列 → 尝试下一行的最右边（你当前代码风格）
+    if (row + 1 < static_cast<int>(key_layout.size())) {
         int next_row = row + 1;
         size_t last = key_layout[next_row].size();
         if (last > 0) {
-            return setFocus(next_row, last - 1);
+            if (trySetFocus(next_row, static_cast<int>(last) - 1)) {
+                return true;
+            }
         }
     }
-	
-    // 如果下面没有，跳到第一个
+
     return focusFirst();
 }
 
 bool KeyWindow::focusLeft() {
     if (!hasFocus()) return false;
-    
+
     int row = current_focus.first;
     int col = current_focus.second;
-    
-    // 向左移动
-    if (col > 0) {
-        return setFocus(row, col - 1);
+
+    // 同一行向左找第一个可焦点的
+    for (int c = col - 1; c >= 0; --c) {
+        if (trySetFocus(row, c)) {
+            return true;
+        }
     }
-    
-    // 已经是最左边，跳到最右
-    return focusRightMost();
+
+    // 到达行首 → 上一行最右（找可焦点的）
+    if (row > 0) {
+        int prev_row = row - 1;
+        for (int c = static_cast<int>(key_layout[prev_row].size()) - 1; c >= 0; --c) {
+            if (trySetFocus(prev_row, c)) {
+                return true;
+            }
+        }
+    }
+
+    // 找不到 → 跳全局最后一个可焦点
+    return focusLast();
 }
+
 
 bool KeyWindow::focusRight() {
     if (!hasFocus()) return false;
-    
+
     int row = current_focus.first;
     int col = current_focus.second;
-    
-    // 向右移动
-    if (col + 1 < static_cast<int>(key_layout[row].size())) {
-        return setFocus(row, col + 1);
+    size_t cols = key_layout[row].size();
+
+    // 同一行向右找第一个可焦点的
+    for (size_t c = col + 1; c < cols; ++c) {
+        if (trySetFocus(row, static_cast<int>(c))) {
+            return true;
+        }
     }
-    
-    // 已经是最右边，跳到最左
-    return focusLeftMost();
+
+    // 到达行尾 → 下一行最左（找可焦点的）
+    if (static_cast<size_t>(row) + 1 < key_layout.size()) {
+        int next_row = row + 1;
+        for (size_t c = 0; c < key_layout[next_row].size(); ++c) {
+            if (trySetFocus(next_row, static_cast<int>(c))) {
+                return true;
+            }
+        }
+    }
+
+    // 找不到 → 跳全局第一个可焦点
+    return focusFirst();
 }
 
 
 bool KeyWindow::focusFirst() {
     if (key_layout.empty()) return false;
-    
-    // 找到第一个非空行
+
     for (size_t r = 0; r < key_layout.size(); ++r) {
-        if (!key_layout[r].empty()) {
-            return setFocus(r, 0);
+        for (size_t c = 0; c < key_layout[r].size(); ++c) {
+            if (trySetFocus(static_cast<int>(r), static_cast<int>(c))) {
+                return true;
+            }
         }
     }
     return false;
@@ -180,30 +234,36 @@ bool KeyWindow::focusFirst() {
 
 bool KeyWindow::focusLast() {
     if (key_layout.empty()) return false;
-    
-    // 从后往前找第一个非空行
+
     for (int r = static_cast<int>(key_layout.size()) - 1; r >= 0; --r) {
-        if (!key_layout[r].empty()) {
-            return setFocus(r, key_layout[r].size() - 1);
+        for (int c = static_cast<int>(key_layout[r].size()) - 1; c >= 0; --c) {
+            if (trySetFocus(r, c)) {
+                return true;
+            }
         }
     }
     return false;
 }
 
-// 移动到当前行最左边
-bool KeyWindow::focusLeftMost() {
-    int row = current_focus.first;
-    return setFocus(row, 0);
-}
+// 暂时不使用以下两个函数
+//
+//// 移动到当前行最左边
+//bool KeyWindow::focusLeftMost() {
+//    int row = current_focus.first;
+//    return setFocus(row, 0);
+//}
+//
+//// 移动到当前行最右边
+//bool KeyWindow::focusRightMost() {
+//    int row = current_focus.first;
+//    if (row >= 0 && row < static_cast<int>(key_layout.size())) {
+//        return setFocus(row, key_layout[row].size() - 1);
+//    }
+//    return false;
+//}
 
-// 移动到当前行最右边
-bool KeyWindow::focusRightMost() {
-    int row = current_focus.first;
-    if (row >= 0 && row < static_cast<int>(key_layout.size())) {
-        return setFocus(row, key_layout[row].size() - 1);
-    }
-    return false;
-}
+// 移动相关结束
+////////////////////////////////////////////////////////////
 
 KeyWindowWidget* KeyWindow::getCurrentWidget() const {
     if (!hasFocus()) return nullptr;

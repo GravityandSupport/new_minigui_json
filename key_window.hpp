@@ -6,13 +6,21 @@
 class KeyWindowWidget : public Widget{
 private:
 	bool m_isFocusGained = false; // 是否获取窗口的输入焦点
+	bool m_isCanFocus = false;
 public:
+
     KeyWindowWidget(const std::string& str):Widget(str){
 
     }
     virtual ~KeyWindowWidget() = default;
 
 	virtual bool isFocusGained() { return m_isFocusGained; } // 是否获取窗口的输入焦点
+
+	virtual void setCanFocus(bool _canFocus){ m_isCanFocus = _canFocus;} // 设置这个控件是否允许获得焦点
+	
+	virtual bool canFocus() const { // 这个控件是否允许获得焦点
+        return m_isCanFocus;  // 默认允许，子类可重写
+    }
 	
     virtual void onFocusLost(){ // 丢失焦点
 		LOG_DEBUG("焦点", name, "丢失焦点");
@@ -53,6 +61,7 @@ public:
 	bool setFocus(size_t row, size_t col); // 设置当前焦点到指定位置
 	bool setFocus(const std::string& name); // 设置当前焦点到指定控件（通过名称）
 	bool setFocus(Widget* widget); // 设置当前焦点到指定控件（通过指针）
+	bool trySetFocus(int row, int col); // 尝试设置焦点，如果目标 widget 不可焦点则返回 false
 	std::pair<int, int> getFocus() const { return current_focus; } // 获取当前焦点位置
 
 	bool hasFocus() const { return current_focus.first >= 0 && current_focus.second >= 0; } // 判断是否有焦点
@@ -60,8 +69,8 @@ public:
 	void clearFocus(); // 清除焦点
 	bool focusFirst(); // 移动到第一行第一个控件
 	bool focusLast();     // 移动到最后一个控件
-	bool focusLeftMost();// 移动到当前行最左边
-	bool focusRightMost();// 移动到当前行最右边
+//	bool focusLeftMost();// 移动到当前行最左边
+//	bool focusRightMost();// 移动到当前行最右边
 	
 	bool focusUp();// 向上移动焦点
     bool focusDown();// 向下移动焦点

@@ -48,6 +48,8 @@ public:
 										
     std::unordered_map<std::string, Widget*> registry_widget; // 子控件
 
+	void forEachRegistryWidget(std::function<void(Widget*)> callback); // 遍历所有已注册的控件
+
     virtual void registerWidget(const std::string &name, Widget &widget);
 	Widget* findWidget(const std::string& name) const; // 通过名字查找已注册的控件，找不到返回nullptr
 

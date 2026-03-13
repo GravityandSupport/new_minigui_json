@@ -33,6 +33,12 @@ Widget* BaseWindow::findWidget(const std::string& name) const {
     return (it != registry_widget.end()) ? it->second : nullptr;
 }
 
+void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
+	for (const auto& pair : registry_widget)
+    {
+        callback(pair.second);
+    }
+}
 
 void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;

@@ -52,7 +52,7 @@ public:
 //	using BaseWindow::registerWidget;
 	virtual void registerWidget(const std::string &name, KeyWindowWidget &widget) ; // 默认是添加一行
 	virtual void registerWidget(const std::string &name, size_t row, KeyWindowWidget &widget); // 往一行后面追加控件，该行不存在会自动生成一行
-	virtual void registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget); // 往固定位置添加控件，如果该位置原本没有控件会抛异常，注意捕获
+//	virtual void registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget); // 往固定位置添加控件，如果该位置原本没有控件会抛异常，注意捕获
 
 	// 获取指定行的引用（用于直接操作）
 	std::vector<KeyWindowWidget*>& getRow(size_t row); // 不存在会抛错误，注意捕获

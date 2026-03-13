@@ -4,6 +4,7 @@ void KeyWindow::registerWidget(const std::string &name, KeyWindowWidget &widget)
 	BaseWindow::registerWidget(name, widget);
 	key_layout.emplace_back();          // 添加空行
     key_layout.back().push_back(&widget); // 该行只包含此控件
+    widget.setCanFocus(true);
 }
 
 void KeyWindow::registerWidget(const std::string &name, size_t row, KeyWindowWidget &widget){
@@ -13,21 +14,22 @@ void KeyWindow::registerWidget(const std::string &name, size_t row, KeyWindowWid
         key_layout.resize(row + 1);
     }
     key_layout[row].push_back(&widget);
+	widget.setCanFocus(true);
 }
 
-void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget){
-	BaseWindow::registerWidget(name, widget);
-	if (row >= key_layout.size()) {
-        LOG_ERROR("越界", "row超过key_layout.size()，无法创建");
-		return;
-    }
-
-	if (col > key_layout[row].size()) {
-        LOG_ERROR("越界", "col超过key_layout[row].size()，无法创建");
-		return;
-    }
-	key_layout[row].insert(key_layout[row].begin() + col, &widget);
-}
+//void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget){
+//	BaseWindow::registerWidget(name, widget);
+//	if (row >= key_layout.size()) {
+//        LOG_ERROR("越界", "row超过key_layout.size()，无法创建");
+//		return;
+//    }
+//
+//	if (col > key_layout[row].size()) {
+//        LOG_ERROR("越界", "col超过key_layout[row].size()，无法创建");
+//		return;
+//    }
+//	key_layout[row].insert(key_layout[row].begin() + col, &widget);
+//}
 
 std::vector<KeyWindowWidget*>& KeyWindow::getRow(size_t row) {
     if (row >= key_layout.size()) {

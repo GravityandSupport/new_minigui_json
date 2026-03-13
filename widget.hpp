@@ -18,6 +18,12 @@ public:
 
     // static int winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
 
+	int bvm_LoadBitmap(const char* path);
+	void bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc); // 绘制位图
+	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y);
+	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h);
+	void bvm_UnloadAllBitmaps(); // 统一卸载全部管理的位图资源
+	
 	void drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat);
 	void drawText(int pText, int nCount, 

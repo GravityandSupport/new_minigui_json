@@ -110,8 +110,37 @@ void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
 
 
 
+int Widget::bvm_LoadBitmap(const char* path){
+	if(parentWindow){
+		return parentWindow->bvm_LoadBitmap(path);
+	}
+	return -1;
+}
 
 
+void Widget::bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc){
+	if(parentWindow){
+		parentWindow->bvm_PaintBitmap(hdc, index, rc);
+	}
+}
+
+void Widget::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y){
+	if(parentWindow){
+		parentWindow->bvm_PaintBitmap(hdc, index, x, y);
+	}
+}
+
+void Widget::bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h){
+	if(parentWindow){
+		parentWindow->bvm_PaintBitmap(hdc, index, x, y, w, h);
+	}
+}
+
+void Widget::bvm_UnloadAllBitmaps(){
+	if(parentWindow){
+		parentWindow->bvm_UnloadAllBitmaps();
+	}
+}
 
 
 

@@ -23,6 +23,12 @@ BaseWindow::~BaseWindow(){
     }
 }
 
+void BaseWindow::forEachOpenWindow(std::function<void(BaseWindow*)> callback){
+	for (const auto& pair : registry_open_window){
+		callback(pair.second);
+	}
+}
+
 void BaseWindow::forEachRegistryWindow(std::function<void(BaseWindow*)> callback){
 	std::map<std::string, BaseWindow*>& registry_window = getRegistryWindow();
 	for (const auto& pair : registry_window)

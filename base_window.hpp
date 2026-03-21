@@ -40,6 +40,7 @@ public:
 		static std::map<std::string, BaseWindow*> registry;
         return registry;
     }
+	static void forEachRegistryWindow(std::function<void(BaseWindow*)> callback);
 
 	static void Create(const std::string &window_name, BaseWindow &hParent);			// 打开窗口
 	static void Create(const std::string &window_name, HWND hParent);			// 打开窗口

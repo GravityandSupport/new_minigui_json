@@ -23,6 +23,14 @@ BaseWindow::~BaseWindow(){
     }
 }
 
+void BaseWindow::forEachRegistryWindow(std::function<void(BaseWindow*)> callback){
+	std::map<std::string, BaseWindow*>& registry_window = getRegistryWindow();
+	for (const auto& pair : registry_window)
+    {
+        callback(pair.second);
+    }
+}
+
 void BaseWindow::registerWidget(const std::string &name, Widget &widget){
 	widget.parentWindow = this;
     registry_widget[name] = &widget;
@@ -102,6 +110,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
     int x,y;
     BaseWindow* self = reinterpret_cast<BaseWindow*>(GetWindowAdditionalData(hWnd));
 
+//	LOG_DEBUG("message", self->name, message);
     switch(message){
         case MSG_INITDIALOG:
             self->hWnd = hWnd;
@@ -256,6 +265,7 @@ void BaseWindow::msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam)  {
 void BaseWindow::msg_destroy(WPARAM wParam, LPARAM lParam)  {
     for(auto& pair : registry_widget){
         pair.second->msg_destroy(wParam, lParam);
+		pair.second->hWnd = HWND_NULL;
     }
 }
 

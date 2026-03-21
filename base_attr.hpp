@@ -103,6 +103,7 @@ public:
     /// @brief 更新脏区域
     virtual void updateDirtyArea(){
     	if(is_can_update==false) return;
+		if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");}
         InvalidateRect(hWnd, &rc, true);
     }
 
@@ -123,6 +124,7 @@ public:
 			}
 		}
 		call();
+		if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");}
 		InvalidateRect(hWnd, &prev_rc, true);
 		for (BaseAttr *w : widgets){
 			w->is_can_update = true; // 允许刷新

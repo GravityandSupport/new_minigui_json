@@ -54,6 +54,13 @@ void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
     }
 }
 
+void BaseWindow::updateDirtyArea(){
+	if(is_can_update==false) return;
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	SetRect(&dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
+    InvalidateRect(hWnd, &dirty_rc, true);
+}
+
 void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;

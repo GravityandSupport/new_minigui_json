@@ -5,8 +5,6 @@
 
 #include "bitmap_manager.hpp"
 
-#define __UI_WINDOW_COMMON_UPDATE__ 10
-
 class BaseWindow : public BaseAttr {
 protected:
 	HDC cache_hdc;
@@ -57,7 +55,6 @@ public:
 	Widget* findWidget(const std::string& name) const; // 通过名字查找已注册的控件，找不到返回nullptr
 
 	virtual void updateDirtyArea() override; // 更新窗口
-	using BaseAttr::unifiedUpdate;
 	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call);
 	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets);
 	

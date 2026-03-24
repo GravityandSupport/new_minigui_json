@@ -107,39 +107,6 @@ public:
         InvalidateRect(hWnd, &rc, true);
     }
 
-	/// @brief 更新脏区域
-	// 在 unifiedUpdate 函数调用期间， widgets 列表内的部件会被禁止刷新，待函数调用结束时再统一刷新
-	static void unifiedUpdate(HWND hWnd, const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
-		bool first = true;
-		RECT prev_rc;
-		if (widgets.size() == 0) {LOG_WARN("空列表", "widgets 是空列表"); return;}
-		for (BaseAttr *w : widgets){
-			if(hWnd != w->hWnd) {LOG_WARNC("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
-			w->is_can_update = false; // 禁止刷新
-			if(first==true){
-				first = false;
-				prev_rc = w->rc;
-			}else{
-				prev_rc = computBoundBox(prev_rc, w->rc);
-			}
-		}
-		call();
-		if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
-		InvalidateRect(hWnd, &prev_rc, true);
-		for (BaseAttr *w : widgets){
-			w->is_can_update = true; // 允许刷新
-		}
-	}
-
-	static void unifiedUpdate(BaseAttr* base_attr, const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
-		if(!base_attr) {LOG_ERROR("空指针", "base_attr 是空指针"); return;}
-		unifiedUpdate(base_attr->hWnd, widgets, call);
-	}
-
-	static void unifiedUpdate(BaseAttr& base_attr, const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
-		unifiedUpdate(base_attr.hWnd, widgets, call);
-	}
-
 	virtual void postMessage(int iMsg, WPARAM wParam, LPARAM lParam){
 		PostMessage(hWnd, iMsg, wParam, lParam);
 	}

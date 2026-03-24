@@ -55,7 +55,6 @@ void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
 }
 
 void BaseWindow::updateDirtyArea(){
-	if(is_can_update==false) return;
 	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
 	SetRect(&dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
     InvalidateRect(hWnd, &dirty_rc, true);
@@ -76,8 +75,12 @@ void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, 
 		}
 	}
 	call();
+	CopyRect(&dirty_rc, &prev_rc);
+	for (RECT& rect : dirty_rc_list){
+		dirty_rc = computBoundBox(rect, dirty_rc);
+	}
 	dirty_rc_list.push_back(prev_rc);
-	PostMessage(hWnd, MSG_COMMAND, __UI_WINDOW_COMMON_UPDATE__, 0); // 通过 msg_common 来执行刷新功能
+	InvalidateRect(hWnd, &dirty_rc, true);
 	for (BaseAttr *w : widgets){
 		w->is_can_update = true; // 允许刷新
 	}
@@ -169,7 +172,8 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
 			self->cache_hdc = hdc;
             self->msg_paint(hdc);
             SetBkMode(hdc, BM_OPAQUE);
-            EndPaint(hWnd, hdc);
+            EndPaint(hWnd, hdc);			
+			self->dirty_rc_list.clear(); // 清除脏区域缓冲
             break;
         case MSG_CLOSE:
             self->msg_close(wParam, lParam);
@@ -203,19 +207,6 @@ void BaseWindow::msg_init(WPARAM wParam, LPARAM lParam)  {
     }
 }
 void BaseWindow::msg_command(WPARAM wParam, LPARAM lParam)  {
-	switch (wParam){
-		case __UI_WINDOW_COMMON_UPDATE__:{
-//			LOG_DEBUG("刷新区域", dirty_rc.left, dirty_rc.top, dirty_rc.right, dirty_rc.bottom);
-			static RECT dirty_rc = {0}; // 这个最好是全局变量，因为待会消息结束了这个变量就被释放了
-			for (RECT& rect : dirty_rc_list){
-				dirty_rc = computBoundBox(rect, dirty_rc);
-			}
-			dirty_rc_list.clear();
-			InvalidateRect(hWnd, &dirty_rc, true);
-			break;
-		}
-		default:break;
-	}
     for(auto& pair : registry_widget){
         pair.second->msg_command(wParam, lParam);
     }

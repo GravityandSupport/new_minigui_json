@@ -60,7 +60,7 @@ void BaseWindow::updateDirtyArea(){
     InvalidateRect(hWnd, &dirty_rc, true);
 }
 
-void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call){
+void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;
 	if (widgets.size() == 0) {LOG_WARN("空列表", "widgets 是空列表"); return;}
@@ -86,9 +86,23 @@ void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, 
 	}
 }
 
-void BaseWindow::unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets){
+void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets){
 	unifiedUpdate(widgets, [](){});
 }
+
+void BaseWindow::unifiedUpdate(){
+	unifiedUpdate([](){});
+}
+
+void BaseWindow::unifiedUpdate(const std::function<void(void)> &call){
+	std::vector<BaseAttr*> attr_list;
+    attr_list.reserve(registry_widget.size()); // 预分配空间
+    for(auto& pair : registry_widget){
+		attr_list.push_back(pair.second);
+    }
+	unifiedUpdate(attr_list, call);
+}
+
 
 void BaseWindow::configDLG(){
     dlg.dwStyle = WS_VISIBLE;

@@ -4,6 +4,8 @@
 #include "widget.hpp"
 
 #include "bitmap_manager.hpp"
+#include "graphics.hpp"
+
 
 class BaseWindow : public BaseAttr {
 protected:
@@ -55,8 +57,10 @@ public:
 	Widget* findWidget(const std::string& name) const; // 通过名字查找已注册的控件，找不到返回nullptr
 
 	virtual void updateDirtyArea() override; // 更新窗口
-	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets, const std::function<void(void)> &call);
-	virtual void unifiedUpdate(const std::initializer_list<BaseAttr*> &widgets);
+	virtual void unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call);
+	virtual void unifiedUpdate(const std::vector<BaseAttr*> &widgets);
+	virtual void unifiedUpdate(const std::function<void(void)> &call);
+	virtual void unifiedUpdate();
 	
     virtual void msg_init(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_command(WPARAM wParam, LPARAM lParam) override;

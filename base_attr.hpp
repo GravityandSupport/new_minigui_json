@@ -88,7 +88,7 @@ public:
         rc.top = json.value("y", 0);
         rc.right = json.value("w", 0) + rc.left;
         rc.bottom = json.value("h", 0) + rc.top;
-		std::cout << json.dump(4) << std::endl;
+//		std::cout << json.dump(4) << std::endl;
     }
 
 	// 计算包围盒

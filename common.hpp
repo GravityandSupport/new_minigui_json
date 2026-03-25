@@ -16,6 +16,7 @@
 #ifdef __cplusplus
 
 #include "base_window.hpp"
+#include "desktop_window.hpp"
 #include "api_common.hpp"
 
 /// @brief 暂时改变字体大小

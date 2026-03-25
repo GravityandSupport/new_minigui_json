@@ -47,7 +47,7 @@ public:
 	static void Create(const std::string &window_name, BaseWindow &hParent);			// 打开窗口
 	static void Create(const std::string &window_name, HWND hParent);			// 打开窗口
 	static void Close(const std::string &window_name); // 关闭窗口
-	void Close();
+	virtual void Close();
 										
     std::unordered_map<std::string, Widget*> registry_widget; // 子控件
 

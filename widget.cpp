@@ -8,11 +8,19 @@ Widget::Widget(const std::string& str)
 }
 
 void Widget::registerWidget(Widget &widget){
+	if(parentWindow==nullptr) {LOG_WARN("空指针", parentWindow, "为空，Widget::registerWidget 调用应该在 BaseWindow::registerWidget 之后"); return;}
+	widget.parentWindow = parentWindow;
 	widget.parentWidget = this;
+
+	widget.getAbsoluteOffset(); // 基于父控件做偏移
+	if(widget.rc.left<rc.left || widget.rc.right>rc.right || widget.rc.top<rc.top || widget.rc.bottom>rc.bottom){
+		LOG_WARN("区域越界", "子控件区域不在父区域内！", widget.rc.left, widget.rc.top, widget.rc.right, widget.rc.bottom, rc.left, rc.top, rc.right, rc.bottom);return;
+	}
+	
     registry_widget.emplace_back(&widget);
 }
 
-Widget::Point Widget::getAbsoluteOffset()
+void Widget::getAbsoluteOffset()
 {
     int x = 0;
     int y = 0;
@@ -27,7 +35,12 @@ Widget::Point Widget::getAbsoluteOffset()
         current = current->parentWidget;
     }
 
-    return Point(x, y);
+    int _w = RECTW(rc);
+	int _h = RECTH(rc);
+	rc.left = x;
+	rc.top = y;
+	rc.right = x+_w;
+	rc.bottom = y+_h;
 }
 
 

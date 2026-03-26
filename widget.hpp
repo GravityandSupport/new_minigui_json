@@ -22,7 +22,7 @@ public:
 	void bvm_PaintBitmap(HDC hdc, size_t index, const RECT &rc); // ����λͼ
 	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y);
 	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h);
-	void bvm_UnloadAllBitmaps(); // ͳһж��ȫ��������λͼ��Դ
+	void bvm_UnloadAllBitmaps(); // 统一卸载所有位图资源
 	
 	void drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat);
@@ -50,7 +50,7 @@ public:
 
     virtual void registerWidget(Widget &widget);
 
-	Point getAbsoluteOffset(); // 会把当前widget::rc的坐标当做对父窗口的偏移坐标，返回控件的坐标基于父窗口的偏移坐标
+	void getAbsoluteOffset(); // 会把当前widget::rc的坐标当做对父窗口的偏移坐标，返回控件的坐标基于父窗口的偏移坐标
 
 	Widget() = default;
     Widget(const std::string& str);

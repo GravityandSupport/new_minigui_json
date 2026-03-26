@@ -33,4 +33,11 @@ void windowClose(const char* window_name){
 	BaseWindow::Close(window_name);
 }
 
+void desktopWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
+	DesktopWindow::allWinProc(hWnd, message, wParam, lParam);
+}
+void desktopWinProcPaint(HWND hWnd, HDC hdc){
+	DesktopWindow::allWinProcPaint(hWnd, hdc);
+}
+
 }

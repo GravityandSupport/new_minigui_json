@@ -2,11 +2,17 @@
 
 DesktopWindow::DesktopWindow(const std::string& str)
     : BaseWindow(str){
-
+    
+	if (!this->name.empty()) {  // 注意是 !name.empty()
+    	auto& desktop_window = getDesktopWindow();
+        desktop_window[this->name] = this;
+        std::cout << "✓ 桌面窗口已注册: " << this->name << " (地址: " << this << ")\n";
+    } else {
+        std::cout << "✗ 桌面窗口跳过注册: 空名字对象 (地址: " << this << ")\n";
+    }
 }
 
 void DesktopWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
-	HDC hdc;
 	int x,y;
 
 	switch(message){
@@ -60,5 +66,19 @@ void DesktopWindow::winProcPaint(HWND hWnd, HDC hdc){
 	this->msg_paint(hdc);
 	SetBkMode(hdc, BM_OPAQUE);
 	this->dirty_rc_list.clear(); // 清除脏区域缓冲
+}
+
+
+void DesktopWindow::allWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
+	auto& desktop_window = getDesktopWindow();
+	for (const auto& pair : desktop_window){
+        pair.second->winProc(hWnd, message, wParam, lParam);
+    }
+}
+void DesktopWindow::allWinProcPaint(HWND hWnd, HDC hdc){
+	auto& desktop_window = getDesktopWindow();
+	for (const auto& pair : desktop_window){
+        pair.second->winProcPaint(hWnd, hdc);
+    }
 }
 

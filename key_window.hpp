@@ -37,15 +37,55 @@ public:
     
 };    
 
+class KeyWidget : public Widget {
+public:
+	std::pair<int, int> current_focus = {-1, -1};					   // {row, col}，-1 表示无焦点
 
-class KeyWindow : public BaseWindow{
+	// 二维是横向，一维是纵向
+	std::vector<std::vector<KeyWindowWidget*>> key_layout; // 按键布局
+
+
+	virtual void registerWidget(KeyWindowWidget &widget) ;
+	virtual void registerWidget(size_t row, KeyWindowWidget &widget);
+
+	bool setFocus(size_t row, size_t col); // 设置当前焦点到指定位置
+	bool setFocus(Widget* widget); // 设置当前焦点到指定控件（通过指针）
+	bool trySetFocus(int row, int col); // 尝试设置焦点，如果目标 widget 不可焦点则返回 false
+	std::pair<int, int> getFocus() const { return current_focus; } // 获取当前焦点位置
+
+	bool hasFocus() const { return current_focus.first >= 0 && current_focus.second >= 0; } // 判断是否有焦点
+	KeyWindowWidget* getCurrentWidget() const; // 获取当前焦点控件（返回 nullptr 表示无焦点）
+
+	void clearFocus(); // 清除焦点
+	bool focusFirst(); // 移动到第一行第一个控件
+	bool focusLast();     // 移动到最后一个控件
+
+	bool focusUp();// 向上移动焦点
+    bool focusDown();// 向下移动焦点
+    bool focusLeft();// 向左移动焦点
+    bool focusRight();// 向右移动焦点
+	// 此函数负责焦点的上下左右移动控制，子类可以重写此函数改变上下左右移动的按键消息
+	// 如果该函数处理了消息会返回true，否则返回 false
+    virtual bool focusMoveControl(WPARAM wParam, LPARAM lParam); 
+	size_t getRowCount() const { return key_layout.size(); } // 获取行数
+	size_t getColumnCount(size_t row) const; // 获取某行的列数
+
+	std::pair<int, int> findWidgetPosition(Widget* widget) const; // 查找控件在布局中的位置
+	
+	// 版本1：传递给当前焦点控件（如果存在）
+    bool sendMessageToCurrent(void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam);
+	
+	KeyWidget(const std::string& str):Widget(str){}
+	virtual ~KeyWidget() = default;
+};
+
+template <typename T>
+class __KeyWindow : public T {
 public:	
 	std::pair<int, int> current_focus = {-1, -1};					   // {row, col}，-1 表示无焦点
 	
-    KeyWindow(const std::string& str):BaseWindow(str){
-
-    }
-    virtual ~KeyWindow() = default;
+     __KeyWindow(const std::string& str):T(str){ }
+    virtual ~__KeyWindow() = default;
 	
 	// 二维是横向，一维是纵向
 	std::vector<std::vector<KeyWindowWidget*>> key_layout; // 按键布局
@@ -108,6 +148,9 @@ public:
     // 版本4：传递给所有控件
     void sendMessageToAll(void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam);
 };
+
+using KeyWindow = __KeyWindow<BaseWindow>;
+using KeyWindowDesktop = __KeyWindow<DesktopWindow>;
 
 #include "key_window.inl"
 

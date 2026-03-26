@@ -1,14 +1,14 @@
 #include "key_window.hpp"
 
-void KeyWindow::registerWidget(const std::string &name, KeyWindowWidget &widget){
-	BaseWindow::registerWidget(name, widget);
+void KeyWidget::registerWidget(KeyWindowWidget &widget){
+	Widget::registerWidget(widget);
 	key_layout.emplace_back();          // 添加空行
     key_layout.back().push_back(&widget); // 该行只包含此控件
     widget.setCanFocus(true);
 }
 
-void KeyWindow::registerWidget(const std::string &name, size_t row, KeyWindowWidget &widget){
-	BaseWindow::registerWidget(name, widget);
+void KeyWidget::registerWidget(size_t row, KeyWindowWidget &widget){
+	Widget::registerWidget(widget);
 	// 策略：自动填充缺失的中间行（空行）
     if (row >= key_layout.size()) {
         key_layout.resize(row + 1);
@@ -17,41 +17,7 @@ void KeyWindow::registerWidget(const std::string &name, size_t row, KeyWindowWid
 	widget.setCanFocus(true);
 }
 
-//void KeyWindow::registerWidget(const std::string &name, size_t row, size_t col, KeyWindowWidget &widget){
-//	BaseWindow::registerWidget(name, widget);
-//	if (row >= key_layout.size()) {
-//        LOG_ERROR("越界", "row超过key_layout.size()，无法创建");
-//		return;
-//    }
-//
-//	if (col > key_layout[row].size()) {
-//        LOG_ERROR("越界", "col超过key_layout[row].size()，无法创建");
-//		return;
-//    }
-//	key_layout[row].insert(key_layout[row].begin() + col, &widget);
-//}
-
-std::vector<KeyWindowWidget*>& KeyWindow::getRow(size_t row) {
-    if (row >= key_layout.size()) {
-        throw std::out_of_range("Row index out of range");
-    }
-    return key_layout[row];
-}
-
-KeyWindowWidget* KeyWindow::getRow(size_t row, size_t col) const {
-    if (row >= key_layout.size() || col >= key_layout[row].size()) {
-		LOG_ERROR("越界", row, key_layout.size(), col);
-        return nullptr; // 安全返回，避免异常
-    }
-    return key_layout[row][col];
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-bool KeyWindow::setFocus(size_t row, size_t col) {
+bool KeyWidget::setFocus(size_t row, size_t col) {
     if (row >= key_layout.size() || col >= key_layout[row].size()) {
         return false;
     }
@@ -70,24 +36,13 @@ bool KeyWindow::setFocus(size_t row, size_t col) {
     
     return true;
 }
-
-bool KeyWindow::setFocus(const std::string& name) {
-    auto it = registry_widget.find(name);
-    if (it == registry_widget.end()) return false;
-    return setFocus(it->second);
-}
-
-bool KeyWindow::setFocus(Widget* widget) {
+bool KeyWidget::setFocus(Widget* widget) {
     if (!widget) return false;
     auto pos = findWidgetPosition(widget);
     if (pos.first == -1) return false;
     return setFocus(pos.first, pos.second);
 }
-
-// ────────────────────────────────────────────────
-
-// 辅助函数：尝试设置焦点，如果目标 widget 不可焦点则返回 false
-bool KeyWindow::trySetFocus(int row, int col) {
+bool KeyWidget::trySetFocus(int row, int col) {
     if (row < 0 || row >= static_cast<int>(key_layout.size())) {
         return false;
     }
@@ -101,14 +56,42 @@ bool KeyWindow::trySetFocus(int row, int col) {
     }
     return false;
 }
+KeyWindowWidget* KeyWidget::getCurrentWidget() const {
+    if (!hasFocus()) return nullptr;
+    return key_layout[current_focus.first][current_focus.second];
+}
+void KeyWidget::clearFocus() {
+   if (hasFocus()) {
+       KeyWindowWidget* current = getCurrentWidget();
+       if (current) current->onFocusLost();
+   }
+    current_focus = {-1, -1};
+}
+bool KeyWidget::focusFirst() {
+    if (key_layout.empty()) return false;
 
-// ────────────────────────────────────────────────
+    for (size_t r = 0; r < key_layout.size(); ++r) {
+        for (size_t c = 0; c < key_layout[r].size(); ++c) {
+            if (trySetFocus(static_cast<int>(r), static_cast<int>(c))) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+bool KeyWidget::focusLast() {
+    if (key_layout.empty()) return false;
 
-////////////////////////////////////////////////////////////
-// 移动相关开始
-
-
-bool KeyWindow::focusUp() {
+    for (int r = static_cast<int>(key_layout.size()) - 1; r >= 0; --r) {
+        for (int c = static_cast<int>(key_layout[r].size()) - 1; c >= 0; --c) {
+            if (trySetFocus(r, c)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+bool KeyWidget::focusUp() {
     if (!hasFocus()) return focusFirst();
 
     int row = current_focus.first;
@@ -135,9 +118,7 @@ bool KeyWindow::focusUp() {
     // 实在找不到 → 跳到最后一个可焦点的
     return focusLast();
 }
-
-
-bool KeyWindow::focusDown() {
+bool KeyWidget::focusDown() {
     if (!hasFocus()) return focusFirst();
 
     int row = current_focus.first;
@@ -163,8 +144,7 @@ bool KeyWindow::focusDown() {
 
     return focusFirst();
 }
-
-bool KeyWindow::focusLeft() {
+bool KeyWidget::focusLeft() {
     if (!hasFocus()) return false;
 
     int row = current_focus.first;
@@ -191,8 +171,7 @@ bool KeyWindow::focusLeft() {
     return focusLast();
 }
 
-
-bool KeyWindow::focusRight() {
+bool KeyWidget::focusRight() {
     if (!hasFocus()) return false;
 
     int row = current_focus.first;
@@ -219,97 +198,7 @@ bool KeyWindow::focusRight() {
     // 找不到 → 跳全局第一个可焦点
     return focusFirst();
 }
-
-
-bool KeyWindow::focusFirst() {
-    if (key_layout.empty()) return false;
-
-    for (size_t r = 0; r < key_layout.size(); ++r) {
-        for (size_t c = 0; c < key_layout[r].size(); ++c) {
-            if (trySetFocus(static_cast<int>(r), static_cast<int>(c))) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-bool KeyWindow::focusLast() {
-    if (key_layout.empty()) return false;
-
-    for (int r = static_cast<int>(key_layout.size()) - 1; r >= 0; --r) {
-        for (int c = static_cast<int>(key_layout[r].size()) - 1; c >= 0; --c) {
-            if (trySetFocus(r, c)) {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-// 暂时不使用以下两个函数
-//
-//// 移动到当前行最左边
-//bool KeyWindow::focusLeftMost() {
-//    int row = current_focus.first;
-//    return setFocus(row, 0);
-//}
-//
-//// 移动到当前行最右边
-//bool KeyWindow::focusRightMost() {
-//    int row = current_focus.first;
-//    if (row >= 0 && row < static_cast<int>(key_layout.size())) {
-//        return setFocus(row, key_layout[row].size() - 1);
-//    }
-//    return false;
-//}
-
-// 移动相关结束
-////////////////////////////////////////////////////////////
-
-KeyWindowWidget* KeyWindow::getCurrentWidget() const {
-    if (!hasFocus()) return nullptr;
-    return key_layout[current_focus.first][current_focus.second];
-}
-
-void KeyWindow::clearFocus() {
-//    if (hasFocus()) {
-//        Widget* current = getCurrentWidget();
-//        if (current) current->onFocusLost();
-//    }
-    current_focus = {-1, -1};
-}
-
-std::pair<int, int> KeyWindow::findWidgetPosition(Widget* widget) const {
-    if (!widget) return {-1, -1};
-    
-    for (size_t r = 0; r < key_layout.size(); ++r) {
-        const auto& row = key_layout[r];
-        for (size_t c = 0; c < row.size(); ++c) {
-            if (row[c] == widget) {
-                return {static_cast<int>(r), static_cast<int>(c)};
-            }
-        }
-    }
-    return {-1, -1};
-}
-
-std::pair<int, int> KeyWindow::findWidgetPosition(const std::string& name) const {
-    auto it = registry_widget.find(name);
-    if (it == registry_widget.end()) return {-1, -1};
-    return findWidgetPosition(it->second);
-}
-
-size_t KeyWindow::getColumnCount(size_t row) const {
-    if (row >= key_layout.size()) return 0;
-    return key_layout[row].size();
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool KeyWindow::focusMoveControl(WPARAM wParam, LPARAM lParam)  {
+bool KeyWidget::focusMoveControl(WPARAM wParam, LPARAM lParam)  {
     switch(wParam){
 		case SCANCODE_CURSORBLOCKUP:
 			focusUp();
@@ -324,49 +213,18 @@ bool KeyWindow::focusMoveControl(WPARAM wParam, LPARAM lParam)  {
 			return focusRight();
 			return true;
 		case SCANCODE_ESCAPE: // 默认关闭窗口消息
-			Close();
+			if(this->parentWindow){this->parentWindow->Close();}
 			return true;
 		default:break;
     }
 	
 	return false;
 }
-
-/*
-
-===== 消息传递函数使用示例 =====
-
-1. 传递给当前焦点控件
-sendMessageToCurrent(&Widget::msg_keyup, wParam, lParam);
-sendMessageToCurrent(&Widget::msg_keydown, wParam, lParam);
-sendMessageToCurrent(&Widget::msg_key_long_press, wParam, lParam);
-sendMessageToCurrent(&Widget::msg_keyup_long, wParam, lParam);
-
-2. 传递给指定位置的控件
-sendMessageToWidget(0, 0, &Widget::msg_keyup, wParam, lParam);
-sendMessageToWidget(0, 0, &Widget::msg_keydown, wParam, lParam);
-sendMessageToWidget(0, 0, &Widget::msg_key_long_press, wParam, lParam);
-sendMessageToWidget(0, 0, &Widget::msg_keyup_long, wParam, lParam);
-
-3. 传递给指定名称的控件
-sendMessageByName("xxx", &Widget::msg_keyup, wParam, lParam);
-sendMessageByName("xxx", &Widget::msg_keydown, wParam, lParam);
-sendMessageByName("xxx", &Widget::msg_key_long_press, wParam, lParam);
-sendMessageByName("xxx", &Widget::msg_keyup_long, wParam, lParam);
-
-4. 传递给所有控件
-sendMessageToAll(&Widget::msg_keyup, wParam, lParam);
-sendMessageToAll(&Widget::msg_keydown, wParam, lParam);
-sendMessageToAll(&Widget::msg_key_long_press, wParam, lParam);
-sendMessageToAll(&Widget::msg_keyup_long, wParam, lParam);
-
-*/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool KeyWindow::sendMessageToCurrent(void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam){
+size_t KeyWidget::getColumnCount(size_t row) const {
+    if (row >= key_layout.size()) return 0;
+    return key_layout[row].size();
+}
+bool KeyWidget::sendMessageToCurrent(void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam){
 	Widget* current = getCurrentWidget();
     if (!current) {
 		LOG_INFO("无效", "当前无有效焦点");
@@ -376,37 +234,17 @@ bool KeyWindow::sendMessageToCurrent(void (Widget::*func)(WPARAM, LPARAM), WPARA
 	(current->*func)(wParam, lParam);
 	return true;
 }
-
-bool KeyWindow::sendMessageToWidget(size_t row, size_t col, 
-    									void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam) {
-    Widget* current = getRow(row, col);
-    if (!current) {
-		LOG_INFO("无效", "当前无有效焦点");
-        return false;  // 无焦点控件
+std::pair<int, int> KeyWidget::findWidgetPosition(Widget* widget) const {
+    if (!widget) return {-1, -1};
+    
+    for (size_t r = 0; r < key_layout.size(); ++r) {
+        const auto& row = key_layout[r];
+        for (size_t c = 0; c < row.size(); ++c) {
+            if (row[c] == widget) {
+                return {static_cast<int>(r), static_cast<int>(c)};
+            }
+        }
     }
-
-	(current->*func)(wParam, lParam);
-	return true;
-}
-
-bool KeyWindow::sendMessageByName(const std::string& name, 
-    									void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam) {
-	Widget* widget = findWidget(name);
-	if (!widget) {
-		return false;  // 未找到控件
-	}
-	
-	(widget->*func)(wParam, lParam);
-	return true;
-}
-
-void KeyWindow::sendMessageToAll(void (Widget::*func)(WPARAM, LPARAM), WPARAM wParam, LPARAM lParam) {
-	for (auto& row : key_layout) {
-		for (Widget* widget : row) {
-			if (widget) {
-				(widget->*func)(wParam, lParam);
-			}
-		}
-	}
+    return {-1, -1};
 }
 

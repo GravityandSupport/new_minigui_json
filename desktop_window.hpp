@@ -18,7 +18,7 @@ public:
 	static void allWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
 	static void allWinProcPaint(HWND hWnd, HDC hdc);
 
-	virtual void updateDirtyArea() override { BaseAttr::updateDirtyArea(); }; // 更新窗口
+	virtual void updateDirtyArea() override; // 更新窗口
 	
 	DesktopWindow() = default;
     DesktopWindow(const std::string& str);

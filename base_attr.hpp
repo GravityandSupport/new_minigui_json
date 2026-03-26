@@ -101,11 +101,7 @@ public:
 	}
 	
     /// @brief 更新脏区域
-    virtual void updateDirtyArea(){
-    	if(is_can_update==false) return;
-		if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
-        InvalidateRect(hWnd, &rc, true);
-    }
+    virtual void updateDirtyArea(){}
 
 	virtual void postMessage(int iMsg, WPARAM wParam, LPARAM lParam){
 		PostMessage(hWnd, iMsg, wParam, lParam);

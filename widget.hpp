@@ -44,6 +44,8 @@ public:
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam) override;
 
+ 	virtual void updateDirtyArea() override;
+	
 	BaseWindow* parentWindow = nullptr;
     Widget *parentWidget = nullptr;
     std::vector<Widget*> registry_widget;

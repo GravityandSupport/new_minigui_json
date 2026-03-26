@@ -1,5 +1,6 @@
 #include "widget.hpp"
 #include "base_window.hpp"
+#include "common.hpp"
 
 
 Widget::Widget(const std::string& str)
@@ -117,6 +118,12 @@ void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
     }
 }
 
+void Widget::updateDirtyArea(){
+	if(is_can_update==false) return;
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if(parentWindow){parentWindow->dirty_rc_list.push_back(rc);}
+	PostMessage(hWnd, MSG_COMMAND, __command_update__, 0);
+}
 
 
 

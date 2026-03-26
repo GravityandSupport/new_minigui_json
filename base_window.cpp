@@ -1,4 +1,5 @@
 #include "base_window.hpp"
+#include "common.hpp"
 
 BaseWindow::BaseWindow(const std::string& str)
     : BaseAttr(str){
@@ -56,8 +57,10 @@ void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
 
 void BaseWindow::updateDirtyArea(){
 	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
-	SetRect(&dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
-    InvalidateRect(hWnd, &dirty_rc, true);
+	RECT _dirty_rc;
+	SetRect(&_dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
+	dirty_rc_list.push_back(_dirty_rc);
+	PostMessage(hWnd, MSG_COMMAND, __command_update__, 0);
 }
 
 void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call){
@@ -75,12 +78,8 @@ void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std:
 		}
 	}
 	call();
-	CopyRect(&dirty_rc, &prev_rc);
-	for (RECT& rect : dirty_rc_list){
-		dirty_rc = computBoundBox(rect, dirty_rc);
-	}
 	dirty_rc_list.push_back(prev_rc);
-	InvalidateRect(hWnd, &dirty_rc, true);
+	PostMessage(hWnd, MSG_COMMAND, __command_update__, 0);
 	for (BaseAttr *w : widgets){
 		w->is_can_update = true; // 允许刷新
 	}
@@ -187,7 +186,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
             self->msg_paint(hdc);
             SetBkMode(hdc, BM_OPAQUE);
             EndPaint(hWnd, hdc);			
-			self->dirty_rc_list.clear(); // 清除脏区域缓冲
+//			self->dirty_rc_list.clear(); // 清除脏区域缓冲
             break;
         case MSG_CLOSE:
             self->msg_close(wParam, lParam);
@@ -221,6 +220,15 @@ void BaseWindow::msg_init(WPARAM wParam, LPARAM lParam)  {
     }
 }
 void BaseWindow::msg_command(WPARAM wParam, LPARAM lParam)  {
+	if(wParam==__command_update__ && !dirty_rc_list.empty()){
+		static RECT bounding_box;
+		bounding_box = dirty_rc_list[0];
+		for (size_t i = 1; i < dirty_rc_list.size(); ++i) {
+	        bounding_box = computBoundBox(bounding_box, const_cast<RECT&>(dirty_rc_list[i]));
+	    }
+		dirty_rc_list.clear(); // 清除脏区域缓冲
+		InvalidateRect(hWnd, &bounding_box, true);
+	}
     for(auto& pair : registry_widget){
         pair.second->msg_command(wParam, lParam);
     }

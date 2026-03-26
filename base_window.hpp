@@ -12,7 +12,7 @@ protected:
 	HDC cache_hdc;
 public:
 	std::vector<RECT> dirty_rc_list; // 脏区域，在 msg_common 消息中刷新这个区域
-	RECT dirty_rc; // 脏区域，这是单个的，和上面的还不太一样的
+//	RECT dirty_rc; // 脏区域，这是单个的，和上面的还不太一样的
 	
     DLGTEMPLATE dlg;
 

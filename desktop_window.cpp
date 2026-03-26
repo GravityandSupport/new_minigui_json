@@ -1,4 +1,5 @@
 #include "desktop_window.hpp"
+#include "common.hpp"
 
 DesktopWindow::DesktopWindow(const std::string& str)
     : BaseWindow(str){
@@ -10,6 +11,11 @@ DesktopWindow::DesktopWindow(const std::string& str)
     } else {
         std::cout << "✗ 桌面窗口跳过注册: 空名字对象 (地址: " << this << ")\n";
     }
+}
+void DesktopWindow::updateDirtyArea(){
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	dirty_rc_list.push_back(rc);
+	PostMessage(hWnd, MSG_COMMAND, __command_update__, 0);
 }
 
 void DesktopWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
@@ -65,7 +71,6 @@ void DesktopWindow::winProcPaint(HWND hWnd, HDC hdc){
 	this->cache_hdc = hdc;
 	this->msg_paint(hdc);
 	SetBkMode(hdc, BM_OPAQUE);
-	this->dirty_rc_list.clear(); // 清除脏区域缓冲
 }
 
 

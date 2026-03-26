@@ -46,6 +46,7 @@ extern "C" {
 // 1s 定时�?
 #define __1s_Timer__ 100
 
+#define __command_update__	0xfeaa // 可能会冲突
 
 // 创建窗口
 void windowCreate(const char* window_name, HWND hParent);

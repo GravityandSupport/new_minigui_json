@@ -2,7 +2,7 @@
 #include "base_window.hpp"
 #include "common.hpp"
 
-
+namespace ui{
 Widget::Widget(const std::string& str)
     : BaseAttr(str){
 
@@ -178,7 +178,7 @@ void Widget::drawText(int pText, int nCount,
 	}
 }
 
-
+}
 
 
 

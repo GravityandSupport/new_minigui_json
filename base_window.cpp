@@ -1,6 +1,8 @@
 #include "base_window.hpp"
 #include "common.hpp"
 
+namespace ui{
+	
 BaseWindow::BaseWindow(const std::string& str)
     : BaseAttr(str){
     
@@ -66,6 +68,7 @@ void BaseWindow::updateDirtyArea(){
 void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
 	if (widgets.size() == 0) {LOG_WARN("空列表", "widgets 是空列表"); return;}
 	for (BaseAttr *w : widgets){
 		if(hWnd != w->hWnd) {LOG_WARNC("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
@@ -377,3 +380,4 @@ void BaseWindow::drawText(int pText, int nCount,
 	DrawText(cache_hdc, text.c_str(), nCount, &text_rc, nFormat);
 }
 
+}

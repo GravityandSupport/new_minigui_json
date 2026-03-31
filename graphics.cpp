@@ -1,6 +1,6 @@
 #include "graphics.hpp"
 
-
+namespace ui{
 Grap::RGB::RGB(int _r, int _g, int _b):r(_r),g(_g),b(_b){
 
 }
@@ -63,3 +63,4 @@ void Grap::fillBox(HDC hdc, const Rect& rc, const RGB& brush_color){
 	FillBox(hdc, _rc.left, _rc.top, RECTW(_rc), RECTH(_rc));
 }
 
+}

@@ -6,6 +6,8 @@
 #include "bitmap_manager.hpp"
 #include "graphics.hpp"
 
+namespace ui{
+
 
 class BaseWindow : public BaseAttr {
 protected:
@@ -81,3 +83,6 @@ public:
     BaseWindow(const std::string& str);
     virtual ~BaseWindow();
 };
+
+}
+

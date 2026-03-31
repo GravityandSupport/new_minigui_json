@@ -3,7 +3,7 @@
 #include "base_attr.hpp"
 
 
-
+namespace ui{
 
 class Grap{
 protected:
@@ -48,3 +48,4 @@ public:
     Grap() = default;
     virtual ~Grap() = default;
 };
+}

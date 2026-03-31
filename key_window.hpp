@@ -2,7 +2,7 @@
 
 #include "common.hpp"
 
-
+namespace ui{
 class KeyWindowWidget : public Widget{
 private:
 	bool m_isFocusGained = false; // 是否获取窗口的输入焦点
@@ -154,6 +154,6 @@ using KeyWindowDesktop = __KeyWindow<DesktopWindow>;
 
 #include "key_window.inl"
 
-
+}
 
 

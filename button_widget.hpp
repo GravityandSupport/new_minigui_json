@@ -3,6 +3,8 @@
 #include "base_attr.hpp"
 #include "widget.hpp"
 
+namespace ui{
+
 class ButtonWidget : public Widget {
 protected:
 	bool m_is_move = false; // 按键在移动中
@@ -27,3 +29,5 @@ public:
     ButtonWidget(const std::string& str);
     virtual ~ButtonWidget() = default;
 };
+
+}

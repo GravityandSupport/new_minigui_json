@@ -2,6 +2,8 @@
 
 #include "base_attr.hpp"
 
+namespace ui{
+
 class BitmapManager{
 public:
 //	int findIndex(BITMAP* bmp); 
@@ -91,4 +93,4 @@ private:
 
 
 
-
+}

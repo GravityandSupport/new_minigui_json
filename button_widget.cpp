@@ -1,6 +1,8 @@
 #include "button_widget.hpp"
 #include "base_window.hpp"
 
+namespace ui{
+
 ButtonWidget::ButtonWidget(const std::string& str)
     : Widget(str){
 
@@ -57,3 +59,4 @@ void ButtonWidget::setButtonBitmap(int press_bitmap, int lift_bitmap){
 }
 
 
+}

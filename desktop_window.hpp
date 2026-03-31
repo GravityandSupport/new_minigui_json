@@ -2,7 +2,7 @@
 
 #include "base_window.hpp"
 
-
+namespace ui{
 class DesktopWindow : public BaseWindow {
 private:
 	void winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam);
@@ -24,3 +24,4 @@ public:
     DesktopWindow(const std::string& str);
     virtual ~DesktopWindow() = default;;
 };
+}

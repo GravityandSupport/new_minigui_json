@@ -1,6 +1,8 @@
 #include "desktop_window.hpp"
 #include "common.hpp"
 
+namespace ui{
+
 DesktopWindow::DesktopWindow(const std::string& str)
     : BaseWindow(str){
     
@@ -87,3 +89,4 @@ void DesktopWindow::allWinProcPaint(HWND hWnd, HDC hdc){
     }
 }
 
+}

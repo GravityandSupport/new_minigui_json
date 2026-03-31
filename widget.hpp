@@ -2,6 +2,8 @@
 
 #include "base_attr.hpp"
 
+namespace ui{
+	
 class BaseWindow;
 
 class Widget : public BaseAttr {
@@ -58,3 +60,5 @@ public:
     Widget(const std::string& str);
     virtual ~Widget() = default;
 };
+
+}

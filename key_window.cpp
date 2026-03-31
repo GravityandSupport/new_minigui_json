@@ -1,5 +1,6 @@
 #include "key_window.hpp"
 
+namespace ui{
 void KeyWidget::registerWidget(KeyWindowWidget &widget){
 	Widget::registerWidget(widget);
 	key_layout.emplace_back();          // 添加空行
@@ -247,4 +248,4 @@ std::pair<int, int> KeyWidget::findWidgetPosition(Widget* widget) const {
     }
     return {-1, -1};
 }
-
+}

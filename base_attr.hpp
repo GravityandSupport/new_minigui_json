@@ -54,6 +54,8 @@ extern "C" {
 }
 #endif
 
+namespace ui{
+
 class BaseAttr {
 protected:
 public:
@@ -131,5 +133,5 @@ public:
 };
 
 
-
+}
 

@@ -26,18 +26,18 @@ void notChangeFontSizeColor(HDC hdc, std::function<void(void)> call){
 extern "C" {
 
 void windowCreate(const char* window_name, HWND hParent){
-	BaseWindow::Create(window_name, hParent);
+	ui::BaseWindow::Create(window_name, hParent);
 }
 
 void windowClose(const char* window_name){
-	BaseWindow::Close(window_name);
+	ui::BaseWindow::Close(window_name);
 }
 
 void desktopWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
-	DesktopWindow::allWinProc(hWnd, message, wParam, lParam);
+	ui::DesktopWindow::allWinProc(hWnd, message, wParam, lParam);
 }
 void desktopWinProcPaint(HWND hWnd, HDC hdc){
-	DesktopWindow::allWinProcPaint(hWnd, hdc);
+	ui::DesktopWindow::allWinProcPaint(hWnd, hdc);
 }
 
 }

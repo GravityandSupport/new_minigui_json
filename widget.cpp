@@ -117,6 +117,11 @@ void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
         pair->msg_destroy(wParam, lParam);
     }
 }
+void Widget::key_long_press(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair->key_long_press(wParam, lParam);
+    }
+}
 
 void Widget::updateDirtyArea(){
 	if(is_can_update==false) return;

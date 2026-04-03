@@ -49,12 +49,14 @@ void DesktopWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam
 			this->msg_mousemove(x, y);
 			break;
 		case MSG_KEYUP:
+			this->long_press_detector.onKeyRelease(this, wParam);
 			this->msg_keyup(wParam, lParam);
 			break;
 		case MSG_KEYDOWN:
 			this->msg_keydown(wParam, lParam);
 			break;
 		case MSG_KEYLONGPRESS:
+			this->long_press_detector.onKeyHold(this, wParam);
 			this->msg_key_long_press(wParam, lParam);
 			break;
 		case MSG_KEYUP_LONG:

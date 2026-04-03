@@ -45,6 +45,7 @@ public:
     virtual void msg_close(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam) override;
+	virtual void key_long_press(WPARAM wParam, LPARAM lParam) override;
 
  	virtual void updateDirtyArea() override;
 	

@@ -1,6 +1,7 @@
 #include "base_window.hpp"
 #include "common.hpp"
 
+
 namespace ui{
 	
 BaseWindow::BaseWindow(const std::string& str)
@@ -105,7 +106,18 @@ void BaseWindow::unifiedUpdate(const std::function<void(void)> &call){
 	unifiedUpdate(attr_list, call);
 }
 
-
+bool BaseWindow::registerLongKey(LongPressDetector::Key key, const LongPressConfig& config){
+	return long_press_detector.registerKey(key, config);
+}
+bool BaseWindow::registerLongKey(LongPressDetector::Key key, const DoubleClickConfig& config){
+	return long_press_detector.registerKey(key, config);
+}
+bool BaseWindow::registerLongKey(LongPressDetector::Key key, const LongPressConfig& lconfig, const DoubleClickConfig& dconfig){
+	return long_press_detector.registerKey(key, lconfig, dconfig);
+}
+void BaseWindow::unregisterLongKey(LongPressDetector::Key key){
+	long_press_detector.unregisterKey(key);
+}
 void BaseWindow::configDLG(){
     dlg.dwStyle = WS_VISIBLE;
     dlg.dwExStyle = WS_EX_AUTOSECONDARYDC;
@@ -168,12 +180,14 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
             self->msg_mousemove(x, y);
             break;
         case MSG_KEYUP:
+			self->long_press_detector.onKeyRelease(self, wParam);
             self->msg_keyup(wParam, lParam);
             break;
         case MSG_KEYDOWN:
             self->msg_keydown(wParam, lParam);
             break;
 		case MSG_KEYLONGPRESS:
+			self->long_press_detector.onKeyHold(self, wParam);
 			self->msg_key_long_press(wParam, lParam);
 			break;
 		case MSG_KEYUP_LONG:
@@ -297,7 +311,11 @@ void BaseWindow::msg_destroy(WPARAM wParam, LPARAM lParam)  {
 		pair.second->hWnd = HWND_NULL;
     }
 }
-
+void BaseWindow::key_long_press(WPARAM wParam, LPARAM lParam)  {
+    for(auto& pair : registry_widget){
+        pair.second->key_long_press(wParam, lParam);
+    }
+}
 
   std::unordered_map<std::string, BaseWindow*> BaseWindow::registry_open_window;
 

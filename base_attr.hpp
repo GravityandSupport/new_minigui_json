@@ -123,6 +123,7 @@ public:
     virtual void msg_close(WPARAM wParam, LPARAM lParam){};
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam){};
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam){};
+	virtual void key_long_press(WPARAM wParam, LPARAM lParam){};
 
 	BaseAttr() = default;
     BaseAttr(const std::string& str){

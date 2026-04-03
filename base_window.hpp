@@ -5,16 +5,18 @@
 
 #include "bitmap_manager.hpp"
 #include "graphics.hpp"
+#include "long_press_detector.hpp"
 
 namespace ui{
-
+class LongPressDetector;
 
 class BaseWindow : public BaseAttr {
 protected:
 	HDC cache_hdc;
+	LongPressDetector long_press_detector; // 长按检测
 public:
 	std::vector<RECT> dirty_rc_list; // 脏区域，在 msg_common 消息中刷新这个区域
-//	RECT dirty_rc; // 脏区域，这是单个的，和上面的还不太一样的
+
 	
     DLGTEMPLATE dlg;
 
@@ -63,6 +65,11 @@ public:
 	virtual void unifiedUpdate(const std::vector<BaseAttr*> &widgets);
 	virtual void unifiedUpdate(const std::function<void(void)> &call);
 	virtual void unifiedUpdate();
+
+	bool registerLongKey(LongPressDetector::Key key, const LongPressConfig& config); // 注册长按消息
+	bool registerLongKey(LongPressDetector::Key key, const DoubleClickConfig& config); // 注册双击消息
+	bool registerLongKey(LongPressDetector::Key key, const LongPressConfig& lconfig, const DoubleClickConfig& dconfig); // 注册长按+双击消息
+	void unregisterLongKey(LongPressDetector::Key key);
 	
     virtual void msg_init(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_command(WPARAM wParam, LPARAM lParam) override;
@@ -78,6 +85,7 @@ public:
     virtual void msg_close(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam) override;
+	virtual void key_long_press(WPARAM wParam, LPARAM lParam) override;
 
 	BaseWindow() = default;
     BaseWindow(const std::string& str);

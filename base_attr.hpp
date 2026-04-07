@@ -125,6 +125,23 @@ public:
     virtual void msg_destroy(WPARAM wParam, LPARAM lParam){};
 	virtual void key_long_press(WPARAM wParam, LPARAM lParam){};
 
+	// ================== 回调定义 ==================
+    std::function<void(WPARAM, LPARAM)> cb_msg_init;
+    std::function<void(WPARAM, LPARAM)> cb_msg_command;
+    std::function<void(int, int)>       cb_msg_lbutton_down;
+    std::function<void(int, int)>       cb_msg_lbutton_up;
+    std::function<void(int, int)>       cb_msg_mousemove;
+    std::function<void(WPARAM, LPARAM)> cb_msg_keyup;
+    std::function<void(WPARAM, LPARAM)> cb_msg_keydown;
+    std::function<void(WPARAM, LPARAM)> cb_msg_key_long_press;
+    std::function<void(WPARAM, LPARAM)> cb_msg_keyup_long;
+    std::function<void(WPARAM, LPARAM)> cb_msg_timer;
+    std::function<void(HDC)>            cb_msg_paint;
+    std::function<void(WPARAM, LPARAM)> cb_msg_close;
+    std::function<void(WPARAM, LPARAM)> cb_msg_nc_lbutton_up;
+    std::function<void(WPARAM, LPARAM)> cb_msg_destroy;
+    std::function<void(WPARAM, LPARAM)> cb_key_long_press;
+
 	BaseAttr() = default;
     BaseAttr(const std::string& str){
         json = nlohmann::json::parse(str);

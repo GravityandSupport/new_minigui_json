@@ -115,6 +115,7 @@ void Widget::msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam)  {
 void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
     for(auto& pair : registry_widget){
         pair->msg_destroy(wParam, lParam);
+		pair->hWnd = HWND_NULL;
     }
 }
 void Widget::key_long_press(WPARAM wParam, LPARAM lParam)  {

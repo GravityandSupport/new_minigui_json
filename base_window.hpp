@@ -17,8 +17,8 @@ protected:
 public:
 	std::vector<RECT> dirty_rc_list; // 脏区域，在 msg_common 消息中刷新这个区域
 
-	
     DLGTEMPLATE dlg;
+	HWND hParent; // 父窗口句柄
 
     virtual bool start(HWND hParent);
 

@@ -47,78 +47,93 @@ void Widget::getAbsoluteOffset()
 
 void Widget::msg_init(WPARAM wParam, LPARAM lParam)  {
     // getParentOffset(); // 计算对于父部件的坐标偏移
+    if(cb_msg_init) {cb_msg_init(wParam, lParam);}
     for(auto& pair : registry_widget){
         pair->hWnd = hWnd;
         pair->msg_init(wParam, lParam);
     }
 }
 void Widget::msg_command(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_command) cb_msg_command(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_command(wParam, lParam);
     }
 }
 void Widget::msg_lbutton_down(int x, int y)  {
+	if (cb_msg_lbutton_down) cb_msg_lbutton_down(x, y);
     for(auto& pair : registry_widget){
         pair->msg_lbutton_down(x, y);
     }
 }
 void Widget::msg_lbutton_up(int x, int y)  {
+	if (cb_msg_lbutton_up) cb_msg_lbutton_up(x, y);
     for(auto& pair : registry_widget){
         pair->msg_lbutton_up(x, y);
     }
 }
 void Widget::msg_mousemove(int x, int y)  {
+	if (cb_msg_mousemove) cb_msg_mousemove(x, y);
     for(auto& pair : registry_widget){
         pair->msg_mousemove(x, y);
     }
 }
 void Widget::msg_keyup(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_keyup) cb_msg_keyup(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_keyup(wParam, lParam);
     }
 }
 void Widget::msg_keydown(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_keydown) cb_msg_keydown(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_keydown(wParam, lParam);
     }
 }
 void Widget::msg_key_long_press(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_key_long_press) cb_msg_key_long_press(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_key_long_press(wParam, lParam);
     }
 }
 void Widget::msg_keyup_long(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_keyup_long) cb_msg_keyup_long(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_keyup_long(wParam, lParam);
     }
 }
 void Widget::msg_timer(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_timer) cb_msg_timer(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_timer(wParam, lParam);
     }
 }
 void Widget::msg_paint(HDC hdc)  {
+	if (cb_msg_paint) cb_msg_paint(hdc);
     for(auto& pair : registry_widget){
         pair->msg_paint(hdc);
     }
 }
 void Widget::msg_close(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_close) cb_msg_close(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_close(wParam, lParam);
     }
 }
 void Widget::msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_nc_lbutton_up) cb_msg_nc_lbutton_up(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_nc_lbutton_up(wParam, lParam);
     }
 }
 void Widget::msg_destroy(WPARAM wParam, LPARAM lParam)  {
+	if (cb_msg_destroy) cb_msg_destroy(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->msg_destroy(wParam, lParam);
 		pair->hWnd = HWND_NULL;
     }
 }
 void Widget::key_long_press(WPARAM wParam, LPARAM lParam)  {
+	if (cb_key_long_press) cb_key_long_press(wParam, lParam);
     for(auto& pair : registry_widget){
         pair->key_long_press(wParam, lParam);
     }
@@ -172,7 +187,7 @@ void Widget::bvm_UnloadAllBitmaps(){
 void Widget::drawText2(size_t id, size_t lang,
 							int x, int y, int w, int h, UINT nFormat){
 	if(parentWindow){
-		parentWindow->drawText(id, lang, x, y, w, h, nFormat);
+		parentWindow->drawText2(id, lang, x, y, w, h, nFormat);
 	}
 }
 

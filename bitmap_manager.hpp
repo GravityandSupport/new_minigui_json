@@ -12,10 +12,25 @@ public:
 
 	// 加载位图资源 
 	int load(const char* path){
+		if (path == nullptr || path[0] == '\0') {
+	        LOG_DEBUGC("位图加载", "Invalid path: null or empty");
+	        return -1;
+	    }
+
+	    std::string finalPath;
+	    // 判断是否为相对路径
+	    if (path[0] == '/') {
+	        finalPath = path;
+	    } else {
+	        finalPath = "/usr/local/share/minigui/res/images/";
+	        finalPath += path;
+	    }
+	
 		BITMAP* pBmp = new BITMAP();
 
-		if (LoadBitmap(HDC_SCREEN, pBmp, path) != 0) {
-            LOG_DEBUGC("位图加载", "%s fail", path);
+		if (LoadBitmap(HDC_SCREEN, pBmp, finalPath.c_str()) != 0) {
+            LOG_DEBUGC("位图加载", "%s fail", finalPath.c_str());
+			delete pBmp;
             return -1;
         }
 

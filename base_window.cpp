@@ -401,6 +401,16 @@ void BaseWindow::bvm_UnloadAllBitmaps(){
 }
 
 
+void BaseWindow::drawText2(size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat){
+	const char* text = nullptr;
+	if(lang_manager){
+		text = lang_manager.getText(id, lang);
+	}else{
+		text = LanguageManager<LangText>::getInstance().getText(id, lang);
+	}
+	if(text){drawText(text, -1, x, y, w, h, nFormat);}
+}
 
 void BaseWindow::drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat){

@@ -39,22 +39,12 @@
 
 #include "outLog.hpp"
 
-#ifdef __cplusplus
-extern "C" { 
-#endif
+#include "../minigui_common.h"
 
-#include <minigui/common.h>
-#include <minigui/minigui.h>
-#include <minigui/gdi.h>
-#include <minigui/window.h>
-#include <minigui/control.h>
-#include <minigui/rkfb.h>
-
-#ifdef __cplusplus
-}
-#endif
 
 namespace ui{
+
+using LangText = __LangText;
 
 class BaseAttr {
 protected:

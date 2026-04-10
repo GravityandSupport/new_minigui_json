@@ -169,6 +169,12 @@ void Widget::bvm_UnloadAllBitmaps(){
 }
 
 
+void Widget::drawText2(size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat){
+	if(parentWindow){
+		parentWindow->drawText(id, lang, x, y, w, h, nFormat);
+	}
+}
 
 void Widget::drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat){

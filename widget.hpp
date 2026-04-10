@@ -25,7 +25,9 @@ public:
 	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y);
 	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h);
 	void bvm_UnloadAllBitmaps(); // 统一卸载所有位图资源
-	
+
+	void drawText2(size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat);
 	void drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat);
 	void drawText(int pText, int nCount, 

@@ -7,6 +7,10 @@
 #include "graphics.hpp"
 #include "long_press_detector.hpp"
 
+#include "LanguageManager.hpp"
+
+
+
 namespace ui{
 class LongPressDetector;
 
@@ -18,7 +22,9 @@ public:
 	std::vector<RECT> dirty_rc_list; // 脏区域，在 msg_common 消息中刷新这个区域
 
     DLGTEMPLATE dlg;
-	HWND hParent; // 父窗口句柄
+	HWND hParent=HWND_NULL; // 父窗口句柄
+
+	LanguageManager<LangText> lang_manager;
 
     virtual bool start(HWND hParent);
 
@@ -32,6 +38,8 @@ public:
 	void bvm_PaintBitmap(HDC hdc, size_t index, int x, int y, int w, int h);
 	void bvm_UnloadAllBitmaps(); // 统一卸载全部管理的位图资源
 
+	void drawText2(size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat);
 	void drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat);
 	void drawText(int pText, int nCount, 
@@ -70,6 +78,8 @@ public:
 	bool registerLongKey(LongPressDetector::Key key, const DoubleClickConfig& config); // 注册双击消息
 	bool registerLongKey(LongPressDetector::Key key, const LongPressConfig& lconfig, const DoubleClickConfig& dconfig); // 注册长按+双击消息
 	void unregisterLongKey(LongPressDetector::Key key);
+
+	
 	
     virtual void msg_init(WPARAM wParam, LPARAM lParam) override;
     virtual void msg_command(WPARAM wParam, LPARAM lParam) override;

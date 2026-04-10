@@ -1,4 +1,6 @@
 #include "common.hpp"
+#include "widget.hpp"
+
 
 void notChangeFontSize(HDC hdc, std::function<void(void)> call){
     PLOGFONT curFont = GetCurFont(hdc);

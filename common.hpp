@@ -34,6 +34,16 @@ void notChangeFontColor(HDC hdc, std::function<void(void)> call);
 /// @param call 
 void notChangeFontSizeColor(HDC hdc, std::function<void(void)> call);
 
+
+// 序列化初始化控件
+template<typename T>
+void initWidget(const std::vector<T*> &widgets, const std::function<void(T*, int)> &call){
+	for(size_t i=0; i<widgets.size(); i++){
+		call(widgets[i], i);
+	}
+}
+
+
 #endif
 
 #ifdef __cplusplus

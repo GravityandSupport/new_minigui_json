@@ -190,6 +190,12 @@ void Widget::drawText2(size_t id, size_t lang,
 		parentWindow->drawText2(id, lang, x, y, w, h, nFormat);
 	}
 }
+void Widget::drawText2(const LanguageManager<LangText>& instance, size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat){
+	if(parentWindow){
+		parentWindow->drawText2(instance, id, lang, x, y, w, h, nFormat);
+	}
+}
 
 void Widget::drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat){

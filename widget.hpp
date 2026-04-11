@@ -1,6 +1,7 @@
 #pragma once
 
 #include "base_attr.hpp"
+#include "LanguageManager.hpp"
 
 namespace ui{
 	
@@ -27,6 +28,8 @@ public:
 	void bvm_UnloadAllBitmaps(); // 统一卸载所有位图资源
 
 	void drawText2(size_t id, size_t lang,
+							int x, int y, int w, int h, UINT nFormat);
+	void drawText2(const LanguageManager<LangText>& instance, size_t id, size_t lang,
 							int x, int y, int w, int h, UINT nFormat);
 	void drawText(const char* pText, int nCount, 
                 			int x, int y, int w, int h, UINT nFormat);

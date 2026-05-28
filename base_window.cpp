@@ -139,7 +139,9 @@ bool BaseWindow::start(HWND hParent){
         return false;
     }
 
-	if(hWnd!=HWND_NULL) {LOG_WARN("窗口句柄异常", "窗口初始化前句柄不为空，检测窗口关闭时是否正常调用destroy流程");}
+	if(hWnd!=HWND_NULL) {LOG_WARN("窗口句柄异常", "窗口初始化前句柄不为空，检测窗口关闭时是否正常调用destroy流程"); return false;}
+
+	if(status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法创建窗口"); return false;}
 	
     loadResources();
 
@@ -157,6 +159,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
     int x,y;
     BaseWindow* self = reinterpret_cast<BaseWindow*>(GetWindowAdditionalData(hWnd));
 
+	if(self->status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法执行窗口函数"); goto STATUS_FALSE;}
 //	LOG_DEBUG("message", self->name, message);
     switch(message){
         case MSG_INITDIALOG:
@@ -230,6 +233,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
         default:
             break;
     }
+STATUS_FALSE:
     return DefaultWindowProc(hWnd,message,wParam,lParam);
 }
 

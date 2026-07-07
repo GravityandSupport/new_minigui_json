@@ -8,7 +8,7 @@
 #include <cstdarg>
 
 #ifndef LOG_LEVEL
-#define LOG_LEVEL LOG_LEVEL_DEBUG
+#define LOG_LEVEL LOG_LEVEL_WARN
 #endif
 
 // 日志等级定义

@@ -74,6 +74,7 @@ public:
 	// 消息处理接口
     void onKeyHold(BaseAttr* win, Key key);
 	void onKeyRelease(BaseAttr* win, Key key);
+	void onTime(BaseAttr* win);
 private:
     struct KeyLongPressState {
         int holdCount = 0;

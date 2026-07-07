@@ -95,6 +95,11 @@ public:
     /// @brief 更新脏区域
     virtual void updateDirtyArea(){}
 
+	virtual void setStatus(bool _status){
+		status = _status;
+		updateDirtyArea();
+	}
+	
 	virtual void postMessage(int iMsg, WPARAM wParam, LPARAM lParam){
 		PostMessage(hWnd, iMsg, wParam, lParam);
 	}

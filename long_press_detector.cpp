@@ -10,8 +10,8 @@ void LongPressDetector::resetState(KeyLongPressState& s)
     s.isLongPressActive = false;
 	s.lastHoldTime = std::chrono::steady_clock::time_point{};  // 重置时间
 
-	s.lastReleaseTime = TimePoint{};
-    s.waitingForSecondClick = false;
+//	s.lastReleaseTime = TimePoint{};
+//    s.waitingForSecondClick = false;
 }
 
 bool LongPressDetector::registerKey(Key key,
@@ -116,24 +116,67 @@ void LongPressDetector::onKeyRelease(BaseAttr* win, Key key)
     auto& s = it->second;
     auto now = std::chrono::steady_clock::now();
 
-    // ==================== 双击判断（新增核心逻辑） ====================
-    if (s.isEnableDouble && s.waitingForSecondClick) {
+	// 如果没有开启双击功能，直接走单击逻辑
+    if (!s.isEnableDouble) {
+        win->key_long_press(key, static_cast<uint32_t>(KeyMsg::Single));
+        resetState(s);
+        return;
+    }
+	LOG_WARN("LONG");
+    // ==================== 开启双击后的核心逻辑 ====================
+    if (s.waitingForSecondClick) {
+        // 【情况 A】这是第二次抬起！
         auto gap = std::chrono::duration_cast<std::chrono::milliseconds>(now - s.lastReleaseTime).count();
 
+        // 再次安全检查，如果在阈值内，触发双击
         if (gap <= s.doubleClickConfig.doubleClickThresholdMs) {
-			win->key_long_press(key, static_cast<uint32_t>(KeyMsg::Double));
-            resetState(s);
-            return;
+            LOG_WARN("long", key, "成功触发排他性双击！间隔ms:", gap);
+            win->key_long_press(key, static_cast<uint32_t>(KeyMsg::Double));
         }
+        
+        // 无论是双击成功还是异常超时，双击事件已消费，复位所有状态
+        s.waitingForSecondClick = false;
+    } 
+    else {
+        // 【情况 B】这是第一次抬起！
+        LOG_WARN("long", key, "第一次点击抬起，拦截单击信号，进入双击等待期...");
+        s.lastReleaseTime = now;
+        s.waitingForSecondClick = true; // 开启标记，交给 onTime 去倒计时
     }
 
-    win->key_long_press(key, static_cast<uint32_t>(KeyMsg::Single));
-
     // 更新状态，进入等待第二次点击窗口
-    s.lastReleaseTime = now;
-    s.waitingForSecondClick = true;
+//    s.lastReleaseTime = now;
+//    s.waitingForSecondClick = true;
 
     resetState(s);   // 注意：双击等待状态已在上面处理，这里重置长按部分
 }
+
+void LongPressDetector::onTime(BaseAttr* win)
+{
+    auto now = std::chrono::steady_clock::now();
+
+    // 遍历所有注册过的按键状态
+    for (auto& pair : m_registeredKeys) {
+        Key key = pair.first;
+        auto& s = pair.second;
+
+        // 如果该按键开启了双击，并且当前正在等待第二击
+        if (s.isEnableDouble && s.waitingForSecondClick) {
+            auto gap = std::chrono::duration_cast<std::chrono::milliseconds>(now - s.lastReleaseTime).count();
+
+            // 一旦当前时间距离第一次抬起的时间超过了阈值 (如 300ms)
+            if (gap > s.doubleClickConfig.doubleClickThresholdMs) {
+                LOG_WARN("long", key, "双击超时，确认用户为单击。延迟触发 Single 信号");
+                
+                // 此时才安全地补发单击信号
+                win->key_long_press(key, static_cast<uint32_t>(KeyMsg::Single));
+                
+                // 触发后关闭等待状态
+                s.waitingForSecondClick = false;
+            }
+        }
+    }
+}
+
 
 }

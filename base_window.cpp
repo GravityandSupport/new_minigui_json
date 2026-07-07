@@ -59,7 +59,7 @@ void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
 }
 
 void BaseWindow::updateDirtyArea(){
-	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if(hWnd==HWND_NULL) {LOG_DEBUG("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
 	RECT _dirty_rc;
 	SetRect(&_dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
 	dirty_rc_list.push_back(_dirty_rc);
@@ -69,10 +69,10 @@ void BaseWindow::updateDirtyArea(){
 void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;
-	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
-	if (widgets.size() == 0) {LOG_WARN("空列表", "widgets 是空列表"); return;}
+	if(hWnd==HWND_NULL) {LOG_DEBUG("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if (widgets.size() == 0) {LOG_DEBUG("空列表", "widgets 是空列表"); return;}
 	for (BaseAttr *w : widgets){
-		if(hWnd != w->hWnd) {LOG_WARNC("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
+		if(hWnd != w->hWnd) {LOG_DEBUGC("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
 		w->is_can_update = false; // 禁止刷新
 		if(first==true){
 			first = false;
@@ -139,9 +139,9 @@ bool BaseWindow::start(HWND hParent){
         return false;
     }
 
-	if(hWnd!=HWND_NULL) {LOG_WARN("窗口句柄异常", "窗口初始化前句柄不为空，检测窗口关闭时是否正常调用destroy流程"); return false;}
+	if(hWnd!=HWND_NULL) {LOG_DEBUG("窗口句柄异常", "窗口初始化前句柄不为空，检测窗口关闭时是否正常调用destroy流程"); return false;}
 
-	if(status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法创建窗口"); return false;}
+	if(status==false) {LOG_DEBUG("窗口被禁用", "窗口状态为禁用，无法创建窗口"); return false;}
 	
     loadResources();
 
@@ -159,7 +159,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
     int x,y;
     BaseWindow* self = reinterpret_cast<BaseWindow*>(GetWindowAdditionalData(hWnd));
 
-	if(self->status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法执行窗口函数"); goto STATUS_FALSE;}
+	if(self->status==false) {LOG_DEBUG("窗口被禁用", "窗口状态为禁用，无法执行窗口函数"); goto STATUS_FALSE;}
 //	LOG_DEBUG("message", self->name, message);
     switch(message){
         case MSG_INITDIALOG:
@@ -242,9 +242,12 @@ void BaseWindow::msg_init(WPARAM wParam, LPARAM lParam)  {
 	if(cb_msg_init) {cb_msg_init(wParam, lParam);}
     for(auto& pair : registry_widget){
         pair.second->hWnd = hWnd;
-        pair.second->msg_init(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_init(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_command(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_command) cb_msg_command(wParam, lParam);
 	if(wParam==__command_update__ && !dirty_rc_list.empty()){
@@ -257,86 +260,127 @@ void BaseWindow::msg_command(WPARAM wParam, LPARAM lParam)  {
 		InvalidateRect(hWnd, &bounding_box, true);
 	}
     for(auto& pair : registry_widget){
-        pair.second->msg_command(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_command(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_lbutton_down(int x, int y)  {
 	if (cb_msg_lbutton_down) cb_msg_lbutton_down(x, y);
     for(auto& pair : registry_widget){
-        pair.second->msg_lbutton_down(x, y);
+        if(pair.second->status) {
+            pair.second->msg_lbutton_down(x, y);
+        }
     }
 }
+
 void BaseWindow::msg_lbutton_up(int x, int y)  {
 	if (cb_msg_lbutton_up) cb_msg_lbutton_up(x, y);
     for(auto& pair : registry_widget){
-        pair.second->msg_lbutton_up(x, y);
+        if(pair.second->status) {
+            pair.second->msg_lbutton_up(x, y);
+        }
     }
 }
+
 void BaseWindow::msg_mousemove(int x, int y)  {
 	if (cb_msg_mousemove) cb_msg_mousemove(x, y);
     for(auto& pair : registry_widget){
-        pair.second->msg_mousemove(x, y);
+        if(pair.second->status) {
+            pair.second->msg_mousemove(x, y);
+        }
     }
 }
+
 void BaseWindow::msg_keyup(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_keyup) cb_msg_keyup(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_keyup(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_keyup(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_keydown(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_keydown) cb_msg_keydown(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_keydown(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_keydown(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_key_long_press(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_key_long_press) cb_msg_key_long_press(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_key_long_press(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_key_long_press(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_keyup_long(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_keyup_long) cb_msg_keyup_long(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_keyup_long(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_keyup_long(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_timer(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_timer) cb_msg_timer(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_timer(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_timer(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_paint(HDC hdc)  {
 	if (cb_msg_paint) cb_msg_paint(hdc);
     for(auto& pair : registry_widget){
-        pair.second->msg_paint(hdc);
+        if(pair.second->status) {
+            pair.second->msg_paint(hdc);
+        }
     }
 }
+
 void BaseWindow::msg_close(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_close) cb_msg_close(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_close(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_close(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_nc_lbutton_up(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_nc_lbutton_up) cb_msg_nc_lbutton_up(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_nc_lbutton_up(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_nc_lbutton_up(wParam, lParam);
+        }
     }
 }
+
 void BaseWindow::msg_destroy(WPARAM wParam, LPARAM lParam)  {
 	if (cb_msg_destroy) cb_msg_destroy(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->msg_destroy(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->msg_destroy(wParam, lParam);
+        }
 		pair.second->hWnd = HWND_NULL;
     }
 }
+
 void BaseWindow::key_long_press(WPARAM wParam, LPARAM lParam)  {
 	if (cb_key_long_press) cb_key_long_press(wParam, lParam);
     for(auto& pair : registry_widget){
-        pair.second->key_long_press(wParam, lParam);
+        if(pair.second->status) {
+            pair.second->key_long_press(wParam, lParam);
+        }
     }
 }
 

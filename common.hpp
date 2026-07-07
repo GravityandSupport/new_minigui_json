@@ -56,6 +56,9 @@ extern "C" {
 // 1s 定时�?
 #define __1s_Timer__ 100
 
+// 双击检测定时器
+#define __double_click_timer__ 0xae
+
 #define __command_update__	0xfeaa // 可能会冲突
 
 // 创建窗口

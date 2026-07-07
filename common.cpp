@@ -42,4 +42,11 @@ void desktopWinProcPaint(HWND hWnd, HDC hdc){
 	ui::DesktopWindow::allWinProcPaint(hWnd, hdc);
 }
 
+void windowStatus(const char* window_name, bool statuss){
+	auto& registry_window = ui::BaseWindow::getRegistryWindow();
+	auto it = registry_window.find(window_name);
+	if(it == registry_window.end()) {LOG_INFO("该窗口没有注册过，找不到对应句柄"); return ;}
+	it->second->setStatus(statuss);
+}
+
 }

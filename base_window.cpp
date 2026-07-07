@@ -59,7 +59,7 @@ void BaseWindow::forEachRegistryWidget(std::function<void(Widget*)> callback){
 }
 
 void BaseWindow::updateDirtyArea(){
-	if(hWnd==HWND_NULL) {LOG_DEBUG("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
 	RECT _dirty_rc;
 	SetRect(&_dirty_rc, 0, 0, RECTW(rc), RECTH(rc));
 	dirty_rc_list.push_back(_dirty_rc);
@@ -69,10 +69,10 @@ void BaseWindow::updateDirtyArea(){
 void BaseWindow::unifiedUpdate(const std::vector<BaseAttr*> &widgets, const std::function<void(void)> &call){
 	bool first = true;
 	RECT prev_rc;
-	if(hWnd==HWND_NULL) {LOG_DEBUG("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
-	if (widgets.size() == 0) {LOG_DEBUG("空列表", "widgets 是空列表"); return;}
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if (widgets.size() == 0) {LOG_WARN("空列表", "widgets 是空列表"); return;}
 	for (BaseAttr *w : widgets){
-		if(hWnd != w->hWnd) {LOG_DEBUGC("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
+		if(hWnd != w->hWnd) {LOG_WARN("控件父窗口不符", "%s 不是此窗口的子部件", w->name.c_str()); continue;}
 		w->is_can_update = false; // 禁止刷新
 		if(first==true){
 			first = false;
@@ -159,7 +159,7 @@ int BaseWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
     int x,y;
     BaseWindow* self = reinterpret_cast<BaseWindow*>(GetWindowAdditionalData(hWnd));
 
-	if(self->status==false) {LOG_DEBUG("窗口被禁用", "窗口状态为禁用，无法执行窗口函数"); goto STATUS_FALSE;}
+	if(self->status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法执行窗口函数"); goto STATUS_FALSE;}
 //	LOG_DEBUG("message", self->name, message);
     switch(message){
         case MSG_INITDIALOG:
@@ -238,7 +238,6 @@ STATUS_FALSE:
 }
 
 void BaseWindow::msg_init(WPARAM wParam, LPARAM lParam)  {
-    LOG_DEBUG("msg_init");
 	if(cb_msg_init) {cb_msg_init(wParam, lParam);}
     for(auto& pair : registry_widget){
         pair.second->hWnd = hWnd;

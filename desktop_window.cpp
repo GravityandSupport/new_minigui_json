@@ -15,7 +15,7 @@ DesktopWindow::DesktopWindow(const std::string& str)
     }
 }
 void DesktopWindow::updateDirtyArea(){
-	if(hWnd==HWND_NULL) {LOG_DEBUG("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
+	if(hWnd==HWND_NULL) {LOG_WARN("无效窗口句柄", "hWnd 为空，请确认是否调用 init函数初始化");return;}
 	dirty_rc_list.push_back(rc);
 	PostMessage(hWnd, MSG_COMMAND, __command_update__, 0);
 }
@@ -23,7 +23,7 @@ void DesktopWindow::updateDirtyArea(){
 void DesktopWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
 	int x,y;
 
-	if(status==false) {LOG_DEBUG("窗口被禁用", "窗口状态为禁用，无法执行窗口函数");return;}
+	if(status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法执行窗口函数");return;}
 	switch(message){
 		case MSG_CREATE:
 			loadResources(); // 桌面窗口的资源加载在放在init中去做了
@@ -76,7 +76,7 @@ void DesktopWindow::winProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam
 }
 
 void DesktopWindow::winProcPaint(HWND hWnd, HDC hdc){
-	if(status==false) {LOG_DEBUG("窗口被禁用", "窗口状态为禁用，无法执行窗口绘制函数"); return;}
+	if(status==false) {LOG_WARN("窗口被禁用", "窗口状态为禁用，无法执行窗口绘制函数"); return;}
 	SetBkMode(hdc, BM_TRANSPARENT);
 	this->cache_hdc = hdc;
 	this->msg_paint(hdc);

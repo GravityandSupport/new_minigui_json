@@ -69,6 +69,9 @@ void windowClose(const char* window_name);
 void desktopWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam); // 执行所有桌面窗口的处理函数
 void desktopWinProcPaint(HWND hWnd, HDC hdc); // 执行所有桌面窗口的处理函数的 MSG_PAINT
 
+void windowStatus(const char* window_name, bool statuss);
+
+
 #ifdef __cplusplus
 }  
 #endif

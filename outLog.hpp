@@ -8,7 +8,7 @@
 #include <cstdarg>
 
 #ifndef LOG_LEVEL
-#define LOG_LEVEL LOG_LEVEL_WARN
+#define LOG_LEVEL LOG_LEVEL_DEBUG
 #endif
 
 // 日志等级定义
@@ -57,7 +57,7 @@ std::string formatArgs(const std::string& names, Args&&... args) {
         if (i > 0) oss << ", ";
 
         const auto& name = argNames[i];
-        // 如果是字符串字面量（"..."），只输出值
+        // 如果是字符串字面量（"..."），只输出�?
         if (!name.empty() && name.front() == '"' && name.back() == '"') {
             oss << argValues[i];
         } else {
@@ -67,25 +67,25 @@ std::string formatArgs(const std::string& names, Args&&... args) {
     return oss.str();
 }
 
-// 尝试从 __PRETTY_FUNCTION__ 中提取更友好的函数名（类名::函数名）
+// 尝试�?__PRETTY_FUNCTION__ 中提取更友好的函数名（类�?:函数名）
 static inline std::string extractNiceFuncName(const char* pretty) {
     std::string s = pretty;
 
-    // 常见 gcc/clang 输出形式：
+    // 常见 gcc/clang 输出形式�?
     //   void MyClass::method(int, std::string) const
     //   int Namespace::Class::func()
     //   static void Class::staticMethod()
     //	 void func()
 
-    // 找到最后一个 :: 的位置
+    // 找到最后一�?:: 的位�?
     size_t last_scope = s.rfind("::");
     if (last_scope == std::string::npos) {
-        // 普通全局函数或lambda，没有类名
-        // 提取纯函数名：先截取到'('之前，再取最后一个空格之后的部分
+        // 普通全局函数或lambda，没有类�?
+        // 提取纯函数名：先截取�?('之前，再取最后一个空格之后的部分
         size_t paren = s.find('(');
         std::string prefix = (paren != std::string::npos) ? s.substr(0, paren) : s;
         
-        // 查找最后一个空格（从右向左搜索）
+        // 查找最后一个空格（从右向左搜索�?
 		size_t last_space = prefix.rfind(' ');
         
         // 如果找到空格且后面还有字符，返回空格后的内容；否则返回整个前缀
@@ -95,14 +95,14 @@ static inline std::string extractNiceFuncName(const char* pretty) {
 		return prefix;  // 无空格或空格在末尾时返回原字符串
     }
 
-    // :: 后面的部分 → 函数名（可能带 const/volatile 等）
+    // :: 后面的部�?�?函数名（可能�?const/volatile 等）
     std::string func_part = s.substr(last_scope + 2);
     size_t paren = func_part.find('(');
     if (paren != std::string::npos) {
         func_part = func_part.substr(0, paren);
     }
 
-    // :: 前面的部分 → 可能包含返回类型、类名、命名空间
+    // :: 前面的部�?�?可能包含返回类型、类名、命名空�?
     std::string before = s.substr(0, last_scope);
 
     // 从后往前找最后一个单词（通常是类名）
@@ -114,7 +114,7 @@ static inline std::string extractNiceFuncName(const char* pretty) {
         class_or_ns = before;
     }
 
-    // 去掉可能的 const/volatile 等修饰（简单处理）
+    // 去掉可能�?const/volatile 等修饰（简单处理）
     size_t const_pos = func_part.find(" const");
     if (const_pos != std::string::npos) {
         func_part.erase(const_pos);
@@ -129,7 +129,7 @@ static inline std::string extractNiceFuncName(const char* pretty) {
 
 class Logger {
 public:
-    // 带参数名展开的日志（推荐使用）
+    // 带参数名展开的日志（推荐使用�?
     template<typename... Args>
     static void log(const char* level,
                     const char* file,
@@ -141,7 +141,7 @@ public:
     {
         std::ostringstream oss;
 
-        // 缩短文件名（只保留最后一部分）
+        // 缩短文件名（只保留最后一部分�?
         std::string filename = file;
         size_t last_slash = filename.find_last_of("/\\");
         if (last_slash != std::string::npos) {
@@ -188,7 +188,7 @@ public:
     }
 };
 
-// 宏定义 - 根据 LOG_LEVEL 控制是否编译
+// 宏定�?- 根据 LOG_LEVEL 控制是否编译
 #if LOG_LEVEL >= LOG_LEVEL_ERROR
 #define LOG_ERROR(msg, ...) \
     Logger::log("ERROR", __FILE__, __PRETTY_FUNCTION__, __LINE__, msg, #__VA_ARGS__, ##__VA_ARGS__)

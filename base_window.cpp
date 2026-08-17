@@ -418,6 +418,16 @@ void BaseWindow::Close(){
 	PostMessage(hWnd, MSG_CLOSE, 0, 0); 
 }
 
+bool BaseWindow::isOpen(){
+	auto it = registry_open_window.find(name);
+	return (it != registry_open_window.end());
+}
+
+bool BaseWindow::isOpen(const std::string &window_name){
+	auto it = registry_open_window.find(window_name);
+	return (it != registry_open_window.end());
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

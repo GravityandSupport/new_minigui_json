@@ -35,6 +35,10 @@ void windowClose(const char* window_name){
 	ui::BaseWindow::Close(window_name);
 }
 
+bool windowIsOpen(const char* window_name){
+	return ui::BaseWindow::isOpen(window_name);
+}
+
 void desktopWinProc(HWND hWnd, int message, WPARAM wParam, LPARAM lParam){
 	ui::DesktopWindow::allWinProc(hWnd, message, wParam, lParam);
 }
